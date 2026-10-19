@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ebeify 20/10 - Album Độc Quyền Dành Tặng Ebe</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Dancing Script cho thư viết tay -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    :root {
+      --accent: #ff7597;
+      --accent-hover: #ff8da9;
+      --accent-glow: rgba(255, 117, 151, 0.35);
+      --bg-base: #0f0f12;
+      --bg-card: #18181c;
+      --bg-elevated: #24242b;
+    }
+
+    body.theme-green {
+      --accent: #1db954;
+      --accent-hover: #1ed760;
+      --accent-glow: rgba(29, 185, 84, 0.35);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-base);
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    .font-handwriting {
+      font-family: 'Dancing Script', cursive;
+    }
+
+    /* Custom Scrollbar chuẩn Spotify */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #121212;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #3e3e46;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
+    }
+
+    /* Hiệu ứng Đĩa Than Xoay */
+    @keyframes spinRecord {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .vinyl-disc {
+      background: 
+        radial-gradient(circle at center, #111 0%, #111 28%, transparent 28%),
+        repeating-radial-gradient(circle at center, #161618 0px, #161618 2px, #242429 3px, #111113 4px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.85), 0 0 35px var(--accent-glow);
+      animation: spinRecord 14s linear infinite;
+      animation-play-state: paused;
+    }
+
+    .vinyl-disc.playing {
+      animation-play-state: running;
+    }
+
+    /* Ánh sáng phản chiếu trên mặt đĩa than */
+    .vinyl-shine {
+      background: conic-gradient(
+        from 40deg,
+        transparent 0deg,
+        rgba(255, 255, 255, 0.09) 25deg,
+        transparent 55deg,
+        transparent 180deg,
+        rgba(255, 255, 255, 0.09) 205deg,
+        transparent 235deg
+      );
+    }
+
+    /* Cần gạt đĩa than (Tonearm) */
+    .tonearm {
+      transform-origin: 78% 18%;
+      transform: rotate(-28deg);
+      transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .tonearm.playing {
+      transform: rotate(2deg);
+    }
+
+    /* Thanh nhạc nhảy (Equalizer bars) */
+    @keyframes eqBounce {
+      0%, 100% { height: 4px; }
+      50% { height: 16px; }
+    }
+    .eq-bar {
+      width: 3px;
+      background-color: var(--accent);
+      border-radius: 2px;
+      display: inline-block;
+      animation: eqBounce 0.8s ease-in-out infinite;
+    }
+    .eq-bar:nth-child(2) { animation-delay: 0.2s; }
+    .eq-bar:nth-child(3) { animation-delay: 0.4s; }
+
+    /* Hiệu ứng Lyrics Active */
+    .lyric-line {
+      transition: all 0.4s ease;
+      opacity: 0.45;
+      transform: scale(0.97);
+      transform-origin: left center;
+    }
+    .lyric-line.active {
+      opacity: 1;
+      transform: scale(1.03);
+      color: var(--accent);
+      font-weight: 700;
+      text-shadow: 0 0 18px var(--accent-glow);
+    }
+
+    /* Dynamic Accent Utilities */
+    .bg-accent { background-color: var(--accent); }
+    .bg-accent:hover { background-color: var(--accent-hover); }
+    .text-accent { color: var(--accent); }
+    .border-accent { border-color: var(--accent); }
+    .shadow-accent { box-shadow: 0 8px 25px var(--accent-glow); }
+
+    /* Range slider custom */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 5px;
+      border-radius: 999px;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.6);
+      margin-top: -4.5px;
+      transition: transform 0.15s ease;
+    }
+    input[type="range"]:hover::-webkit-slider-thumb {
+      transform: scale(1.25);
+      background: var(--accent);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-pink-500 selection:text-white relative">
+
+  <!-- Canvas hạt tim bay & pháo giấy -->
+  <canvas id="fxCanvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+  <!-- Âm thanh HTML5 (Có kèm bộ tạo giai điệu Music Box tự động nếu chưa gắn file mp3) -->
+  <audio id="bgAudio" preload="auto" crossorigin="anonymous"></audio>
+
+  <!-- ==================== TOP BAR (SPOTIFY HEADER) ==================== -->
+  <header class="sticky top-0 z-30 backdrop-blur-xl bg-[#0f0f12]/80 border-b border-white/10 px-4 lg:px-8 py-3 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-black font-extrabold text-xl shadow-accent">
+        <i class="fa-solid fa-compact-disc fa-spin" style="animation-duration: 8s;"></i>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-extrabold tracking-tight text-lg">Ebeify</span>
+          <span class="text-[11px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/10 text-accent font-semibold border border-white/10">20/10 Special</span>
+        </div>
+        <p class="text-xs text-zinc-400 hidden sm:block">Trình phát nhạc & lưu trữ kỷ niệm độc quyền của <span class="ebe-name-bind text-white font-medium">Ebe</span></p>
+      </div>
+    </div>
+
+    <!-- Bộ đếm ngày yêu Realtime (Từ 11/09/2025) -->
+    <div class="flex items-center gap-2 bg-[#1c1c22] border border-white/10 px-3.5 py-1.5 rounded-full text-xs sm:text-sm shadow-inner">
+      <i class="fa-solid fa-heart text-accent animate-pulse"></i>
+      <span class="text-zinc-300 hidden md:inline">Bên nhau từ <strong id="startDateDisplay" class="text-white">11/09/2025</strong>:</span>
+      <span id="loveTimerText" class="font-bold text-accent tracking-wide">...</span>
+    </div>
+
+    <!-- Cụm nút Công cụ: Đổi màu Theme & Mở Customizer -->
+    <div class="flex items-center gap-2">
+      <button id="themeToggleBtn" title="Đổi màu Hồng lãng mạn / Xanh Spotify" class="px-3 py-2 rounded-full bg-[#1f1f27] hover:bg-[#2a2a35] border border-white/10 text-xs font-semibold flex items-center gap-1.5 transition">
+        <span class="w-2.5 h-2.5 rounded-full bg-accent inline-block"></span>
+        <span class="hidden sm:inline" id="themeLabel">Tone Hồng</span>
+      </button>
+
+      <button id="openGiftModalBtn" class="px-3.5 py-2 rounded-full bg-accent text-black font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-accent transition transform hover:scale-105">
+        <i class="fa-solid fa-gift"></i>
+        <span>Quà 20/10</span>
+      </button>
+
+      <button id="openCustomDrawerBtn" title="Chỉnh sửa nhanh ảnh, nhạc, lời chúc" class="p-2 sm:px-3 sm:py-2 rounded-full bg-white/10 hover:bg-white/20 text-xs font-medium flex items-center gap-1.5 transition">
+        <i class="fa-solid fa-sliders text-accent"></i>
+        <span class="hidden lg:inline">Custom Nhanh</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT (SPLIT 2 COLUMNS) ==================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+    <!-- CỘT TRÁI (5/12): ĐĨA THAN XOAY + TRÌNH PHÁT NHẠC + LYRICS ĐỒNG BỘ -->
+    <section class="lg:col-span-5 flex flex-col gap-5 lg:sticky lg:top-20">
+      
+      <!-- Card Đĩa Than & Player -->
+      <div class="bg-[#18181c] border border-white/10 rounded-3xl p-5 sm:p-6 shadow-2xl relative overflow-hidden">
+        <!-- Ánh sáng nền mờ ảo -->
+        <div class="absolute -top-24 -left-24 w-64 h-64 rounded-full blur-3xl opacity-20 pointer-events-none bg-accent"></div>
+
+        <!-- Header nhỏ trên máy phát -->
+        <div class="flex items-center justify-between text-xs text-zinc-400 mb-4">
+          <span class="uppercase tracking-widest font-semibold flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-accent animate-ping"></span>
+            Đang Phát Cho <span class="ebe-name-bind text-white">Ebe</span>
+          </span>
+          <span id="audioModeBadge" class="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-[11px]">
+            <i class="fa-solid fa-music mr-1 text-accent"></i>Giai điệu Music Box
+          </span>
+        </div>
+
+        <!-- Mâm Đĩa Than (Vinyl Turntable) -->
+        <div class="relative mx-auto w-60 h-60 sm:w-64 sm:h-64 my-2 flex items-center justify-center select-none">
+          <!-- Khung đế mâm đĩa -->
+          <div class="absolute inset-0 rounded-2xl bg-[#121216] border border-white/5 shadow-inner"></div>
+
+          <!-- Đĩa than xoay -->
+          <div id="vinylDisc" class="vinyl-disc relative w-52 h-52 sm:w-56 sm:h-56 rounded-full flex items-center justify-center cursor-pointer" title="Bấm vào đĩa để Phát / Tạm dừng">
+            <div class="vinyl-shine absolute inset-0 rounded-full pointer-events-none"></div>
+            <!-- Nhãn tâm đĩa (Ảnh Avatar của Ebe) -->
+            <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-4 border-[#1f1f24] shadow-lg relative z-10">
+              <img id="vinylAvatar" src="" alt="Ebe Avatar" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/300x300/ff7597/ffffff?text=Ebe+%E2%9D%A4'" />
+              <!-- Lỗ trục giữa đĩa -->
+              <div class="w-3.5 h-3.5 rounded-full bg-[#121212] border border-white/30 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+            </div>
+          </div>
+
+          <!-- Cần gạt kim đĩa than (Tonearm) -->
+          <div id="tonearm" class="tonearm absolute -top-2 -right-2 w-24 h-36 pointer-events-none z-20">
+            <svg viewBox="0 0 100 150" class="w-full h-full drop-shadow-lg">
+              <!-- Trục xoay -->
+              <circle cx="78" cy="26" r="14" fill="#2a2a32" stroke="#52525b" stroke-width="3"/>
+              <circle cx="78" cy="26" r="6" fill="#e4e4e7"/>
+              <!-- Thanh kim -->
+              <path d="M78 26 L62 110 L46 128" fill="none" stroke="#d4d4d8" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- Đầu đọc kim -->
+              <rect x="38" y="122" width="14" height="9" rx="2" transform="rotate(-35 45 126)" fill="#ff7597"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Thông tin Track Đang phát -->
+        <div class="mt-4 flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <h2 id="nowPlayingTitle" class="text-lg sm:text-xl font-bold truncate text-white">Ngày đầu tiên: 11/09/2025</h2>
+            <p id="nowPlayingArtist" class="text-xs sm:text-sm text-zinc-400 truncate mt-0.5">Người Yêu Của Ebe ft. Ebe</p>
+          </div>
+          <button id="likeBtn" title="Thả tim cho ebe" class="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-accent text-lg transition active:scale-125 shrink-0">
+            <i class="fa-solid fa-heart"></i>
+          </button>
+        </div>
+
+        <!-- Thanh Progress Bar -->
+        <div class="mt-4">
+          <input id="progressBar" type="range" min="0" max="100" value="0" class="w-full accent-pink-400" />
+          <div class="flex justify-between text-[11px] text-zinc-400 font-medium mt-1">
+            <span id="currentTimeText">00:00</span>
+            <span id="totalTimeText">20:10</span>
+          </div>
+        </div>
+
+        <!-- Các nút Điều khiển nhạc chuẩn Spotify -->
+        <div class="mt-3 flex items-center justify-between px-2">
+          <button id="shuffleBtn" title="Trộn bài" class="text-zinc-400 hover:text-white transition text-sm">
+            <i class="fa-solid fa-shuffle"></i>
+          </button>
+          <button id="prevBtn" title="Bài trước" class="text-zinc-200 hover:text-white transition text-lg">
+            <i class="fa-solid fa-backward-step"></i>
+          </button>
+          <button id="playPauseBtn" title="Phát / Tạm dừng" class="w-14 h-14 rounded-full bg-accent text-black flex items-center justify-center text-xl shadow-accent hover:scale-105 active:scale-95 transition">
+            <i id="playPauseIcon" class="fa-solid fa-play ml-0.5"></i>
+          </button>
+          <button id="nextBtn" title="Bài tiếp theo" class="text-zinc-200 hover:text-white transition text-lg">
+            <i class="fa-solid fa-forward-step"></i>
+          </button>
+          <button id="repeatBtn" title="Lặp lại mãi mãi" class="text-accent transition text-sm">
+            <i class="fa-solid fa-repeat"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Card Lyrics Chạy Đồng Bộ (Tâm Thư 20/10) -->
+      <div class="bg-[#18181c] border border-white/10 rounded-3xl p-5 shadow-xl relative overflow-hidden">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-microphone-lines text-accent text-sm"></i>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-300">Lyrics / Lời Chúc 20/10 Đang Chạy</h3>
+          </div>
+          <button id="openFullLetterBtn" class="text-xs font-semibold text-accent hover:underline flex items-center gap-1">
+            <i class="fa-solid fa-envelope-open-text"></i> Mở toàn bộ tâm thư
+          </button>
+        </div>
+
+        <!-- Khung cuộn lời chúc đồng bộ -->
+        <div id="lyricsContainer" class="h-44 overflow-y-auto pr-2 space-y-3 scroll-smooth">
+          <!-- Render tự động từ CONFIG.letterLines -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- CỘT PHẢI (7/12): ALBUM HEADER + MEMORY SPOTLIGHT + DANH SÁCH TRACK KỶ NIỆM -->
+    <section class="lg:col-span-7 flex flex-col gap-6">
+
+      <!-- Banner Album "Spotify Artist / Exclusive Wrapped" -->
+      <div class="rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-[#2b1620] via-[#1c1a24] to-[#141418] border border-white/10 shadow-2xl flex flex-col sm:flex-row items-center sm:items-end gap-6 relative overflow-hidden">
+        <div class="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/15 shrink-0 relative group">
+          <img id="albumCoverImg" src="" alt="Album Cover" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/400x400/ff7597/ffffff?text=20/10+Ebe'" />
+          <div class="absolute bottom-2 right-2 bg-black/70 backdrop-blur-md px-2 py-0.5 rounded-md text-[10px] font-bold text-accent">
+            11/09/2025
+          </div>
+        </div>
+
+        <div class="flex-1 text-center sm:text-left">
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs font-semibold mb-2">
+            <i class="fa-solid fa-circle-check text-blue-400"></i>
+            <span>Ebe Đáng Yêu Nhất Hệ Mặt Trời</span>
+          </div>
+          <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-white leading-tight">
+            Happy 20/10, <span class="ebe-name-bind text-accent">Ebe</span>!
+          </h1>
+          <p id="albumSubtitle" class="text-xs sm:text-sm text-zinc-300 mt-2 leading-relaxed">
+            Tuyển tập những khoảnh khắc ngọt ngào nhất kể từ ngày định mệnh <strong>11/09/2025</strong>. Bấm vào từng bài hát bên dưới để mở khóa lời nhắn riêng nha!
+          </p>
+
+          <div class="mt-4 flex flex-wrap items-center justify-center sm:justify-start gap-3 text-xs text-zinc-300">
+            <span class="bg-white/10 px-3 py-1 rounded-full font-semibold">
+              <i class="fa-solid fa-user-pen text-accent mr-1"></i>Tạo bởi: <strong class="sender-name-bind text-white">Anh</strong>
+            </span>
+            <span class="bg-white/10 px-3 py-1 rounded-full font-semibold">
+              <i class="fa-solid fa-calendar-check text-accent mr-1"></i>Kỷ niệm: <strong>11/09/2025</strong>
+            </span>
+            <span class="bg-white/10 px-3 py-1 rounded-full font-semibold">
+              <i class="fa-solid fa-star text-yellow-400 mr-1"></i>Độ cute: <strong>1000%</strong>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card "Memory Spotlight" - Hiển thị chi tiết kỷ niệm của Track đang chọn -->
+      <div class="bg-[#18181c] border border-white/10 rounded-3xl p-5 sm:p-6 shadow-xl">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs uppercase tracking-wider font-bold text-accent flex items-center gap-1.5">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Câu Chuyện Của Track Đang Chọn
+          </span>
+          <span id="spotlightTrackBadge" class="text-xs text-zinc-400 font-medium">Track #1</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center bg-[#121216] p-4 rounded-2xl border border-white/5">
+          <div class="sm:col-span-4 aspect-square sm:aspect-[4/3] rounded-xl overflow-hidden bg-zinc-800">
+            <img id="spotlightImg" src="" alt="Memory Photo" class="w-full h-full object-cover transition duration-500 hover:scale-105" onerror="this.src='https://placehold.co/400x300/27272a/ff7597?text=K%E1%BB%B7+Ni%E1%BB%87m+%E2%9D%A4'" />
+          </div>
+          <div class="sm:col-span-8 space-y-2">
+            <h3 id="spotlightTitle" class="text-base sm:text-lg font-bold text-white"></h3>
+            <p id="spotlightNote" class="text-sm text-zinc-300 leading-relaxed"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Danh Sách Bài Hát Kỷ Niệm (Tracklist) -->
+      <div class="bg-[#18181c] border border-white/10 rounded-3xl p-5 sm:p-6 shadow-xl">
+        <div class="flex items-center justify-between pb-3 mb-3 border-b border-white/10 text-xs text-zinc-400 font-semibold uppercase tracking-wider">
+          <div class="flex items-center gap-3">
+            <span class="w-6 text-center">#</span>
+            <span>Tên Kỷ Niệm / Lời Chúc</span>
+          </div>
+          <span><i class="fa-regular fa-clock mr-1"></i>Thời lượng</span>
+        </div>
+
+        <div id="tracklistContainer" class="space-y-1.5">
+          <!-- Render tự động từ CONFIG.tracks -->
+        </div>
+
+        <!-- Nút lớn mở Hộp Quà / Voucher 20/10 ở cuối danh sách -->
+        <div class="mt-6 pt-5 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="text-center sm:text-left">
+            <h4 class="font-bold text-sm text-white">Đặc quyền 20/10 dành riêng cho <span class="ebe-name-bind text-accent">Ebe</span></h4>
+            <p class="text-xs text-zinc-400">Nghe hết playlist rồi thì bấm vào đây để nhận Voucher độc quyền nha!</p>
+          </div>
+          <button id="openGiftModalBtnBottom" class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-accent text-black font-extrabold text-sm shadow-accent hover:scale-105 transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-ticket-simple"></i>
+            <span>Mở Đặc Quyền 20/10</span>
+          </button>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- ==================== MODAL 1: BỨC THƯ TAY 20/10 ĐẦY ĐỦ ==================== -->
+  <div id="letterModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-md p-4">
+    <div class="bg-[#1c1a21] border border-pink-500/30 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative animate-fadeIn">
+      <button id="closeLetterModalBtn" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-zinc-300">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="text-center mb-4">
+        <span class="inline-block px-3 py-1 rounded-full bg-pink-500/15 text-accent text-xs font-semibold mb-2">
+          Gửi từ ngày 11/09/2025 đến mãi về sau
+        </span>
+        <h3 class="font-handwriting text-3xl sm:text-4xl text-accent">Thư gửi <span class="ebe-name-bind">Ebe</span> ngày 20/10</h3>
+      </div>
+
+      <div id="fullLetterContent" class="bg-[#131217] border border-white/10 rounded-2xl p-5 text-zinc-200 text-sm sm:text-base leading-relaxed whitespace-pre-line max-h-[60vh] overflow-y-auto">
+      </div>
+
+      <div class="mt-5 flex items-center justify-between">
+        <span class="font-handwriting text-2xl text-accent">Yêu ebe rất nhiều, <span class="sender-name-bind">Anh</span> ♥</span>
+        <button id="shootHeartsFromLetterBtn" class="px-4 py-2 rounded-full bg-accent text-black font-bold text-xs shadow-accent hover:scale-105 transition">
+          <i class="fa-solid fa-heart mr-1"></i> Bắn tim ngập màn hình
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 2: NHẬN VOUCHER QUÀ TẶNG 20/10 ==================== -->
+  <div id="giftModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-md p-4">
+    <div class="bg-[#18181f] border border-white/15 rounded-3xl max-w-xl w-full p-6 sm:p-7 shadow-2xl relative">
+      <button id="closeGiftModalBtn" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-zinc-300">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-12 h-12 rounded-2xl bg-accent/20 border border-accent flex items-center justify-center text-accent text-2xl">
+          <i class="fa-solid fa-gift"></i>
+        </div>
+        <div>
+          <h3 class="text-xl font-extrabold text-white">Kho Voucher 20/10 Của <span class="ebe-name-bind text-accent">Ebe</span></h3>
+          <p class="text-xs text-zinc-400">Ebe bấm chọn lấy hết cũng được, hiệu lực trọn đời không giới hạn!</p>
+        </div>
+      </div>
+
+      <div id="voucherListContainer" class="space-y-3 max-h-[55vh] overflow-y-auto pr-1">
+        <!-- Render tự động từ CONFIG.vouchers -->
+      </div>
+
+      <div id="voucherStatusBox" class="mt-4 p-3 rounded-xl bg-white/5 border border-white/10 text-center text-xs text-zinc-300">
+        Bấm vào nút <strong>"Nhận liền"</strong> ở từng voucher để lưu đặc quyền nhé!
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== DRAWER 3: BẢNG CUSTOM NHANH TRỰC TIẾP TRÊN WEB ==================== -->
+  <div id="customDrawer" class="fixed inset-0 z-50 hidden justify-end bg-black/70 backdrop-blur-sm">
+    <div class="bg-[#18181f] border-l border-white/15 w-full max-w-md h-full flex flex-col justify-between p-6 overflow-y-auto shadow-2xl">
+      <div class="space-y-5">
+        <div class="flex items-center justify-between border-b border-white/10 pb-4">
+          <div>
+            <h3 class="font-bold text-lg text-white flex items-center gap-2">
+              <i class="fa-solid fa-sliders text-accent"></i> Tùy Chỉnh Nhanh (Custom)
+            </h3>
+            <p class="text-xs text-zinc-400">Thay đổi nội dung trực tiếp & copy code CONFIG mới</p>
+          </div>
+          <button id="closeCustomDrawerBtn" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block text-zinc-300 font-semibold mb-1">Tên gọi thân mật của người yêu (Ebe):</label>
+            <input id="customEbeName" type="text" class="w-full px-3 py-2 rounded-xl bg-[#111115] border border-white/15 text-white focus:outline-none focus:border-pink-400" />
+          </div>
+
+          <div>
+            <label class="block text-zinc-300 font-semibold mb-1">Tên xưng hô của bạn:</label>
+            <input id="customSenderName" type="text" class="w-full px-3 py-2 rounded-xl bg-[#111115] border border-white/15 text-white focus:outline-none focus:border-pink-400" />
+          </div>
+
+          <div>
+            <label class="block text-zinc-300 font-semibold mb-1">Ngày bắt đầu yêu (YYYY-MM-DD):</label>
+            <input id="customStartDate" type="date" class="w-full px-3 py-2 rounded-xl bg-[#111115] border border-white/15 text-white focus:outline-none focus:border-pink-400" />
+          </div>
+
+          <div>
+            <label class="block text-zinc-300 font-semibold mb-1">Link Ảnh Đại Diện / Bìa Đĩa (URL):</label>
+            <input id="customAvatarUrl" type="text" placeholder="Dán link ảnh của ebe vào đây..." class="w-full px-3 py-2 rounded-xl bg-[#111115] border border-white/15 text-white focus:outline-none focus:border-pink-400" />
+          </div>
+
+          <div>
+            <label class="block text-zinc-300 font-semibold mb-1">Link Nhạc Nền MP3 (Để trống sẽ phát Music Box tự động):</label>
+            <input id="customAudioUrl" type="text" placeholder="https://.../nhac-cua-ban.mp3" class="w-full px-3 py-2 rounded-xl bg-[#111115] border border-white/15 text-white focus:outline-none focus:border-pink-400" />
+          </div>
+
+          <div>
+            <label class="block text-zinc-300 font-semibold mb-1">Tâm thư 20/10 đầy đủ:</label>
+            <textarea id="customFullLetter" rows="5" class="w-full px-3 py-2 rounded-xl bg-[#111115] border border-white/15 text-white focus:outline-none focus:border-pink-400"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-4 border-t border-white/10 space-y-2 mt-6">
+        <button id="applyCustomBtn" class="w-full py-2.5 rounded-xl bg-accent text-black font-bold text-xs shadow-accent hover:opacity-95 transition">
+          <i class="fa-solid fa-check mr-1"></i> Áp Dụng Ngay Lên Giao Diện
+        </button>
+        <button id="copyConfigCodeBtn" class="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-xs transition flex items-center justify-center gap-1.5">
+          <i class="fa-regular fa-copy"></i> Copy Đoạn Code CONFIG Đã Sửa
+        </button>
+        <p id="copyFeedbackText" class="text-[11px] text-center text-emerald-400 hidden">Đã copy CONFIG vào bộ nhớ tạm! Bạn chỉ cần dán đè vào đầu thẻ script.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- PHẦN CẤU HÌNH DỄ CUSTOM NHẤT (CHỈ CẦN SỬA NỘI DUNG TRONG BIẾN CONFIG NÀY) -->
+  <!-- ========================================================================= -->
+  <script>
+    /**
+     * 💡 HƯỚNG DẪN TỰ SỬA NỘI DUNG (CUSTOM):
+     * Bạn chỉ cần thay đổi chữ, link ảnh, hoặc lời chúc nằm trong dấu ngoặc kép "" bên dưới.
+     * Hoặc bấm nút "Custom Nhanh" ở góc phải trên cùng của trang web để sửa trực tiếp!
+     */
+    const CONFIG = {
+      // 1. Tên gọi thân mật của người yêu và của bạn
+      ebeName: "Ebe",
+      senderName: "Anh",
+
+      // 2. Ngày hai bạn bắt đầu quen nhau (Định dạng: Năm-Tháng-Ngày -> 11/09/2025)
+      startDate: "2025-09-11",
+
+      // 3. Link ảnh đại diện ở tâm đĩa than & bìa Album (Bạn có thể thay bằng link ảnh của ebe)
+      avatarUrl: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=800&q=80",
+
+      // 4. Link nhạc MP3 (Nếu để trống "" hoặc link lỗi, web sẽ tự động đánh đàn Music Box lãng mạn)
+      audioUrl: "",
+
+      // 5. Các câu Lyrics (Lời chúc 20/10 chạy từng dòng như Spotify)
+      letterLines: [
+        "🎵 Gửi ebe nhỏ đáng yêu nhất của anh...",
+        "Từ ngày 11/09/2025 định mệnh ấy,",
+        "Thế giới của anh bỗng có thêm một mặt trời nhỏ.",
+        "Hôm nay là 20/10 — ngày đặc biệt của riêng ebe,",
+        "Chúc công chúa của anh luôn cười tươi 100 điểm,",
+        "Mọi muộn phiền đều tan biến ngoài cánh cửa,",
+        "Mỗi ngày trôi qua đều được yêu thương và chiều chuộng.",
+        "Cảm ơn ebe vì đã đến và làm cuộc sống của anh rực rỡ hơn!",
+        "Happy Vietnamese Women's Day 20/10, ebe của anh ♥"
+      ],
+
+      // 6. Toàn bộ bức tâm thư khi bấm "Mở toàn bộ tâm thư"
+      fullLetter: `Gửi ebe bé bỏng của anh,
+
+Vậy là tụi mình đã đi cùng nhau từ cột mốc 11/09/2025. Mỗi ngày có ebe bên cạnh đều là một bản nhạc thật êm dịu và hạnh phúc mà anh muốn bấm nút Repeat mãi không thôi.
+
+Nhân ngày Phụ nữ Việt Nam 20/10, anh chúc ebe của anh luôn giữ được nụ cười tỏa nắng, luôn bình an, xinh đẹp và tự tin làm những điều mình thích. Dù ngoài kia có bận rộn thế nào, về bên anh thì ebe cứ yên tâm làm em bé được cưng chiều nhất nhé.
+
+Thương ebe rất nhiều!`,
+
+      // 7. Danh sách các bài hát (Tracklist Kỷ Niệm) - Bấm vào từng bài sẽ đổi ảnh & lời nhắn
+      tracks: [
+        {
+          id: 1,
+          title: "Ngày đầu tiên: 11/09/2025",
+          subtitle: "Khởi đầu hành trình bên ebe",
+          duration: "11:09",
+          note: "Ngày 11/09/2025 — ngày câu chuyện của tụi mình chính thức bắt đầu. Khoảnh khắc ấy đến giờ nghĩ lại vẫn làm tim anh đập nhanh như nhịp nhạc này vậy.",
+          image: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=800&q=80"
+        },
+        {
+          id: 2,
+          title: "Nụ cười 100 điểm của ebe",
+          subtitle: "Giai điệu chữa lành mọi mệt mỏi",
+          duration: "∞",
+          note: "Chỉ cần nhìn thấy ebe cười tít mắt là bao nhiêu áp lực hay mệt mỏi trong ngày của anh đều bay biến sạch sẽ. Nụ cười 1000 điểm không có nhưng!",
+          image: "https://images.unsplash.com/photo-1494774157365-9e04c6720e47?auto=format&fit=crop&w=800&q=80"
+        },
+        {
+          id: 3,
+          title: "Những lúc ebe dỗi cute xỉu",
+          subtitle: "Dỗi nhưng vẫn thương",
+          duration: "05:20",
+          note: "Có những lúc ebe phụng phịu giận dỗi nhìn vừa thương vừa buồn cười. Dỗi một xíu thôi rồi để anh dỗ dành bằng trà sữa và đồ ăn ngon nha!",
+          image: "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=800&q=80"
+        },
+        {
+          id: 4,
+          title: "20/10 vạn điều rực rỡ & bình an",
+          subtitle: "Bản nhạc dành riêng cho ngày hôm nay",
+          duration: "20:10",
+          note: "Chúc ebe ngày 20/10 ngập tràn hoa, quà, niềm vui và những điều ngọt ngào nhất. Ebe xứng đáng với tất cả những điều tuyệt vời nhất thế gian!",
+          image: "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=800&q=80"
+        },
+        {
+          id: 5,
+          title: "Hành trình phía trước cùng ebe",
+          subtitle: "Repeat mãi mãi",
+          duration: "3000",
+          note: "Từ 11/09/2025 đến nhiều năm sau nữa, mình cùng nhau viết thêm thật nhiều track nhạc mới, đi ăn thật nhiều món ngon và chụp thật nhiều ảnh đẹp nhé!",
+          image: "https://images.unsplash.com/photo-1474552226712-ac0f0961a954?auto=format&fit=crop&w=800&q=80"
+        }
+      ],
+
+      // 8. Các Voucher Quà Tặng 20/10 cho Ebe bấm nhận
+      vouchers: [
+        {
+          id: "v1",
+          icon: "fa-mug-hot",
+          title: "Voucher 1 Chầu Trà Sữa & Đồ Ăn Vặt Full Topping",
+          desc: "Ebe chỉ việc chọn quán, mọi thứ còn lại để anh lo hết!"
+        },
+        {
+          id: "v2",
+          icon: "fa-crown",
+          title: "Voucher 1 Ngày Làm Công Chúa Không Lo Nghĩ",
+          desc: "Được chiều chuộng 100%, nói gì cũng đúng, không ai được phép cãi!"
+        },
+        {
+          id: "v3",
+          icon: "fa-heart-circle-bolt",
+          title: "Voucher 1000 Cái Ôm Ấm Áp Miễn Phí",
+          desc: "Quy đổi bất cứ lúc nào ebe thấy mệt hoặc nhớ anh."
+        }
+      ]
+    };
+
+    // =========================================================================
+    // LOGIC VẬN HÀNH TRÌNH PHÁT NHẠC, BỘ ĐẾM NGÀY YÊU & HIỆU ỨNG
+    // =========================================================================
+
+    let currentTrackIndex = 0;
+    let isPlaying = false;
+    let progressPercent = 0;
+    let currentLyricIndex = 0;
+    let simInterval = null;
+    let claimedVouchers = new Set();
+
+    // Bộ tạo âm thanh Music Box Web Audio API (giúp web phát nhạc du dương ngay cả khi không có file MP3 ngoài)
+    let audioCtx = null;
+    let musicBoxTimer = null;
+    const melodyNotes = [523.25, 659.25, 783.99, 1046.50, 880.00, 1046.50, 783.99, 659.25, 587.33, 698.46, 880.00, 1174.66, 783.99, 987.77, 1046.50];
+    let noteCursor = 0;
+
+    function playMusicBoxNote() {
+      if (!isPlaying) return;
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        const freq = melodyNotes[noteCursor % melodyNotes.length];
+        noteCursor++;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.08, audioCtx.currentTime + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.1);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 1.15);
+      } catch (e) {
+        // Ignore audio context restriction errors
+      }
+    }
+
+    // 1. Khởi tạo và hiển thị dữ liệu từ CONFIG
+    function renderAllFromConfig() {
+      // Tên Ebe & Người gửi
+      document.querySelectorAll('.ebe-name-bind').forEach(el => el.textContent = CONFIG.ebeName);
+      document.querySelectorAll('.sender-name-bind').forEach(el => el.textContent = CONFIG.senderName);
+
+      // Ngày bắt đầu yêu định dạng DD/MM/YYYY
+      const parts = CONFIG.startDate.split('-');
+      if (parts.length === 3) {
+        document.getElementById('startDateDisplay').textContent = `${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+
+      // Ảnh đại diện tâm đĩa & bìa album
+      document.getElementById('vinylAvatar').src = CONFIG.avatarUrl;
+      document.getElementById('albumCoverImg').src = CONFIG.avatarUrl;
+
+      // Nhạc nền nếu có URL
+      const bgAudio = document.getElementById('bgAudio');
+      const badge = document.getElementById('audioModeBadge');
+      if (CONFIG.audioUrl && CONFIG.audioUrl.trim() !== "") {
+        bgAudio.src = CONFIG.audioUrl.trim();
+        badge.innerHTML = `<i class="fa-solid fa-headphones mr-1 text-accent"></i>MP3 Audio`;
+      } else {
+        bgAudio.removeAttribute('src');
+        badge.innerHTML = `<i class="fa-solid fa-music mr-1 text-accent"></i>Giai điệu Music Box`;
+      }
+
+      // Render Lyrics
+      const lyricsBox = document.getElementById('lyricsContainer');
+      lyricsBox.innerHTML = '';
+      CONFIG.letterLines.forEach((line, idx) => {
+        const p = document.createElement('p');
+        p.className = `lyric-line text-sm sm:text-base cursor-pointer ${idx === currentLyricIndex ? 'active' : ''}`;
+        p.textContent = line;
+        p.onclick = () => {
+          currentLyricIndex = idx;
+          progressPercent = Math.round((idx / Math.max(1, CONFIG.letterLines.length - 1)) * 100);
+          document.getElementById('progressBar').value = progressPercent;
+          highlightLyric(idx);
+        };
+        lyricsBox.appendChild(p);
+      });
+
+      // Render Tâm thư đầy đủ
+      document.getElementById('fullLetterContent').textContent = CONFIG.fullLetter;
+
+      // Render Tracklist
+      renderTracklist();
+      selectTrack(currentTrackIndex, false);
+
+      // Render Vouchers
+      renderVouchers();
+      updateLoveCounter();
+    }
+
+    // 2. Bộ đếm thời gian yêu nhau tính từ 11/09/2025
+    function updateLoveCounter() {
+      const start = new Date(CONFIG.startDate + "T00:00:00");
+      const now = new Date();
+      const diffMs = now - start;
+
+      if (isNaN(diffMs)) {
+        document.getElementById('loveTimerText').textContent = "Mãi bên nhau";
+        return;
+      }
+
+      const totalDays = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+      const hours = Math.max(0, Math.floor((diffMs / (1000 * 60 * 60)) % 24));
+      const mins = Math.max(0, Math.floor((diffMs / (1000 * 60)) % 60));
+
+      document.getElementById('loveTimerText').textContent = `${totalDays} ngày ${hours}h ${mins}p`;
+    }
+
+    // 3. Render danh sách bài hát kỷ niệm
+    function renderTracklist() {
+      const container = document.getElementById('tracklistContainer');
+      container.innerHTML = '';
+
+      CONFIG.tracks.forEach((track, index) => {
+        const isCurrent = index === currentTrackIndex;
+        const row = document.createElement('div');
+        row.className = `group flex items-center justify-between p-3 rounded-2xl cursor-pointer transition ${
+          isCurrent ? 'bg-white/10 border border-white/15' : 'hover:bg-white/5 border border-transparent'
+        }`;
+
+        row.innerHTML = `
+          <div class="flex items-center gap-3.5 min-w-0">
+            <div class="w-6 text-center text-xs font-bold ${isCurrent ? 'text-accent' : 'text-zinc-400'}">
+              ${isCurrent && isPlaying
+                ? '<div class="flex items-end justify-center gap-0.5 h-4"><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span></div>'
+                : index + 1}
+            </div>
+            <img src="${track.image}" alt="${track.title}" class="w-11 h-11 rounded-xl object-cover shrink-0 border border-white/10" onerror="this.src='https://placehold.co/100x100/27272a/ff7597?text=Ebe'" />
+            <div class="min-w-0">
+              <p class="font-bold text-sm truncate ${isCurrent ? 'text-accent' : 'text-white'}">${track.title}</p>
+              <p class="text-xs text-zinc-400 truncate">${track.subtitle || (`Dành tặng ${CONFIG.ebeName}`)}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 shrink-0 ml-2">
+            <span class="text-xs font-semibold text-zinc-400">${track.duration}</span>
+          </div>
+        `;
+
+        row.onclick = () => {
+          selectTrack(index, true);
+          spawnFloatingHearts(8);
+        };
+
+        container.appendChild(row);
+      });
+    }
+
+    // 4. Chọn bài hát & cập nhật Memory Spotlight
+    function selectTrack(index, autoPlay = false) {
+      currentTrackIndex = (index + CONFIG.tracks.length) % CONFIG.tracks.length;
+      const track = CONFIG.tracks[currentTrackIndex];
+
+      document.getElementById('nowPlayingTitle').textContent = track.title;
+      document.getElementById('nowPlayingArtist').textContent = `${CONFIG.senderName} ft. ${CONFIG.ebeName}`;
+      document.getElementById('totalTimeText').textContent = track.duration === '∞' ? '∞' : track.duration;
+
+      // Spotlight Card
+      document.getElementById('spotlightTrackBadge').textContent = `Track #${currentTrackIndex + 1}`;
+      document.getElementById('spotlightImg').src = track.image;
+      document.getElementById('spotlightTitle').textContent = track.title;
+      document.getElementById('spotlightNote').textContent = track.note;
+
+      if (autoPlay && !isPlaying) {
+        togglePlayPause(true);
+      } else {
+        renderTracklist();
+      }
+    }
+
+    // 5. Điều khiển Phát / Tạm dừng
+    function togglePlayPause(forceState) {
+      isPlaying = typeof forceState === 'boolean' ? forceState : !isPlaying;
+
+      const disc = document.getElementById('vinylDisc');
+      const arm = document.getElementById('tonearm');
+      const icon = document.getElementById('playPauseIcon');
+      const bgAudio = document.getElementById('bgAudio');
+
+      if (isPlaying) {
+        disc.classList.add('playing');
+        arm.classList.add('playing');
+        icon.className = 'fa-solid fa-pause';
+        spawnFloatingHearts(12);
+
+        if (CONFIG.audioUrl && CONFIG.audioUrl.trim() !== "") {
+          bgAudio.play().catch(() => {
+            startMusicBoxFallback();
+          });
+        } else {
+          startMusicBoxFallback();
+        }
+        startSimulationLoop();
+      } else {
+        disc.classList.remove('playing');
+        arm.classList.remove('playing');
+        icon.className = 'fa-solid fa-play ml-0.5';
+        bgAudio.pause();
+        stopMusicBoxFallback();
+        stopSimulationLoop();
+      }
+
+      renderTracklist();
+    }
+
+    function startMusicBoxFallback() {
+      stopMusicBoxFallback();
+      playMusicBoxNote();
+      musicBoxTimer = setInterval(playMusicBoxNote, 950);
+    }
+
+    function stopMusicBoxFallback() {
+      if (musicBoxTimer) {
+        clearInterval(musicBoxTimer);
+        musicBoxTimer = null;
+      }
+    }
+
+    // 6. Vòng lặp chạy Thanh tiến trình & Lyrics đồng bộ
+    function startSimulationLoop() {
+      stopSimulationLoop();
+      simInterval = setInterval(() => {
+        progressPercent = (progressPercent + 2) % 102;
+        if (progressPercent > 100) progressPercent = 0;
+
+        document.getElementById('progressBar').value = progressPercent;
+
+        // Cập nhật đồng hồ giả lập
+        const secTotal = Math.floor((progressPercent / 100) * 180);
+        const m = String(Math.floor(secTotal / 60)).padStart(2, '0');
+        const s = String(secTotal % 60).padStart(2, '0');
+        document.getElementById('currentTimeText').textContent = `${m}:${s}`;
+
+        // Đồng bộ câu lyrics
+        const lineIndex = Math.min(
+          CONFIG.letterLines.length - 1,
+          Math.floor((progressPercent / 100) * CONFIG.letterLines.length)
+        );
+        if (lineIndex !== currentLyricIndex) {
+          currentLyricIndex = lineIndex;
+          highlightLyric(currentLyricIndex);
+        }
+      }, 650);
+    }
+
+    function stopSimulationLoop() {
+      if (simInterval) {
+        clearInterval(simInterval);
+        simInterval = null;
+      }
+    }
+
+    function highlightLyric(index) {
+      const container = document.getElementById('lyricsContainer');
+      const lines = container.querySelectorAll('.lyric-line');
+      lines.forEach((el, idx) => {
+        if (idx === index) {
+          el.classList.add('active');
+          el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else {
+          el.classList.remove('active');
+        }
+      });
+    }
+
+    // 7. Render & Xử lý nhận Voucher 20/10
+    function renderVouchers() {
+      const container = document.getElementById('voucherListContainer');
+      container.innerHTML = '';
+
+      CONFIG.vouchers.forEach(v => {
+        const isClaimed = claimedVouchers.has(v.id);
+        const item = document.createElement('div');
+        item.className = 'p-4 rounded-2xl bg-[#121217] border border-white/10 flex items-center justify-between gap-4';
+        item.innerHTML = `
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-accent text-lg shrink-0">
+              <i class="fa-solid ${v.icon}"></i>
+            </div>
+            <div>
+              <h4 class="font-bold text-sm text-white">${v.title}</h4>
+              <p class="text-xs text-zinc-400 mt-0.5">${v.desc}</p>
+            </div>
+          </div>
+          <button data-id="${v.id}" class="claim-voucher-btn shrink-0 px-3.5 py-2 rounded-xl font-bold text-xs transition ${
+            isClaimed
+              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+              : 'bg-accent text-black shadow-accent hover:scale-105'
+          }">
+            ${isClaimed ? '<i class="fa-solid fa-check mr-1"></i>Đã Nhận' : 'Nhận liền'}
+          </button>
+        `;
+        container.appendChild(item);
+      });
+
+      container.querySelectorAll('.claim-voucher-btn').forEach(btn => {
+        btn.onclick = () => {
+          const id = btn.getAttribute('data-id');
+          claimedVouchers.add(id);
+          renderVouchers();
+          spawnFloatingHearts(22);
+          document.getElementById('voucherStatusBox').innerHTML = `
+            🎉 <strong class="text-accent">${CONFIG.ebeName}</strong> đã lưu thành công <strong>${claimedVouchers.size}/${CONFIG.vouchers.length}</strong> voucher đặc quyền 20/10! Chụp màn hình gửi cho <strong class="text-white">${CONFIG.senderName}</strong> để chốt đơn nha!
+          `;
+        };
+      });
+    }
+
+    // 8. Hiệu ứng Canvas Tim bay & Lấp lánh
+    const canvas = document.getElementById('fxCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function spawnFloatingHearts(count = 15) {
+      const colors = ['#ff7597', '#ff4d79', '#ffb3c6', '#1db954', '#fde047'];
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: canvas.height + 20,
+          size: 10 + Math.random() * 14,
+          speedY: 1.8 + Math.random() * 2.8,
+          speedX: (Math.random() - 0.5) * 1.6,
+          opacity: 1,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rotation: Math.random() * Math.PI * 2
+        });
+      }
+    }
+
+    function drawHeart(x, y, size, color, alpha) {
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      const topCurveHeight = size * 0.3;
+      ctx.moveTo(x, y + topCurveHeight);
+      ctx.bezierCurveTo(x, y, x - size / 2, y, x - size / 2, y + topCurveHeight);
+      ctx.bezierCurveTo(x - size / 2, y + (size + topCurveHeight) / 2, x, y + (size + topCurveHeight) / 1.4, x, y + size);
+      ctx.bezierCurveTo(x, y + (size + topCurveHeight) / 1.4, x + size / 2, y + (size + topCurveHeight) / 2, x + size / 2, y + topCurveHeight);
+      ctx.bezierCurveTo(x + size / 2, y, x, y, x, y + topCurveHeight);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.y -= p.speedY;
+        p.x += p.speedX;
+        p.opacity -= 0.006;
+        drawHeart(p.x, p.y, p.size, p.color, Math.max(0, p.opacity));
+        if (p.opacity <= 0 || p.y < -40) {
+          particles.splice(i, 1);
+        }
+      }
+      requestAnimationFrame(animateParticles);
+    }
+
+    // 9. Sự kiện Nút bấm & Tương tác
+    window.onload = function () {
+      renderAllFromConfig();
+      animateParticles();
+      setInterval(updateLoveCounter, 30000);
+
+      // Click Đĩa than hoặc nút Play
+      document.getElementById('playPauseBtn').onclick = () => togglePlayPause();
+      document.getElementById('vinylDisc').onclick = () => togglePlayPause();
+
+      // Next / Prev / Shuffle / Like
+      document.getElementById('nextBtn').onclick = () => selectTrack(currentTrackIndex + 1, true);
+      document.getElementById('prevBtn').onclick = () => selectTrack(currentTrackIndex - 1, true);
+      document.getElementById('shuffleBtn').onclick = () => {
+        const rand = Math.floor(Math.random() * CONFIG.tracks.length);
+        selectTrack(rand, true);
+      };
+      document.getElementById('likeBtn').onclick = () => spawnFloatingHearts(25);
+
+      // Thanh tua nhạc
+      document.getElementById('progressBar').oninput = (e) => {
+        progressPercent = Number(e.target.value);
+        const lineIndex = Math.min(
+          CONFIG.letterLines.length - 1,
+          Math.floor((progressPercent / 100) * CONFIG.letterLines.length)
+        );
+        currentLyricIndex = lineIndex;
+        highlightLyric(currentLyricIndex);
+      };
+
+      // Đổi màu chủ đề (Hồng Lãng Mạn <-> Xanh Spotify)
+      document.getElementById('themeToggleBtn').onclick = () => {
+        document.body.classList.toggle('theme-green');
+        const isGreen = document.body.classList.contains('theme-green');
+        document.getElementById('themeLabel').textContent = isGreen ? 'Xanh Spotify' : 'Tone Hồng';
+      };
+
+      // Modal Tâm Thư
+      const letterModal = document.getElementById('letterModal');
+      document.getElementById('openFullLetterBtn').onclick = () => {
+        letterModal.classList.remove('hidden');
+        letterModal.classList.add('flex');
+        spawnFloatingHearts(15);
+      };
+      document.getElementById('closeLetterModalBtn').onclick = () => {
+        letterModal.classList.add('hidden');
+        letterModal.classList.remove('flex');
+      };
+      document.getElementById('shootHeartsFromLetterBtn').onclick = () => spawnFloatingHearts(35);
+
+      // Modal Quà 20/10
+      const giftModal = document.getElementById('giftModal');
+      const openGift = () => {
+        giftModal.classList.remove('hidden');
+        giftModal.classList.add('flex');
+        spawnFloatingHearts(18);
+      };
+      document.getElementById('openGiftModalBtn').onclick = openGift;
+      document.getElementById('openGiftModalBtnBottom').onclick = openGift;
+      document.getElementById('closeGiftModalBtn').onclick = () => {
+        giftModal.classList.add('hidden');
+        giftModal.classList.remove('flex');
+      };
+
+      // Bảng Custom Nhanh (Quick Customizer Drawer)
+      const customDrawer = document.getElementById('customDrawer');
+      document.getElementById('openCustomDrawerBtn').onclick = () => {
+        document.getElementById('customEbeName').value = CONFIG.ebeName;
+        document.getElementById('customSenderName').value = CONFIG.senderName;
+        document.getElementById('customStartDate').value = CONFIG.startDate;
+        document.getElementById('customAvatarUrl').value = CONFIG.avatarUrl;
+        document.getElementById('customAudioUrl').value = CONFIG.audioUrl;
+        document.getElementById('customFullLetter').value = CONFIG.fullLetter;
+        customDrawer.classList.remove('hidden');
+        customDrawer.classList.add('flex');
+      };
+      document.getElementById('closeCustomDrawerBtn').onclick = () => {
+        customDrawer.classList.add('hidden');
+        customDrawer.classList.remove('flex');
+      };
+
+      // Áp dụng Custom Nhanh
+      document.getElementById('applyCustomBtn').onclick = () => {
+        CONFIG.ebeName = document.getElementById('customEbeName').value.trim() || "Ebe";
+        CONFIG.senderName = document.getElementById('customSenderName').value.trim() || "Anh";
+        CONFIG.startDate = document.getElementById('customStartDate').value || "2025-09-11";
+        CONFIG.avatarUrl = document.getElementById('customAvatarUrl').value.trim() || CONFIG.avatarUrl;
+        CONFIG.audioUrl = document.getElementById('customAudioUrl').value.trim();
+        CONFIG.fullLetter = document.getElementById('customFullLetter').value;
+
+        renderAllFromConfig();
+        spawnFloatingHearts(15);
+        customDrawer.classList.add('hidden');
+        customDrawer.classList.remove('flex');
+      };
+
+      // Copy đoạn code CONFIG đã sửa vào clipboard
+      document.getElementById('copyConfigCodeBtn').onclick = () => {
+        const exportCode = `const CONFIG = ${JSON.stringify(CONFIG, null, 2)};`;
+        const tempInput = document.createElement('textarea');
+        tempInput.value = exportCode;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+
+        const fb = document.getElementById('copyFeedbackText');
+        fb.classList.remove('hidden');
+        setTimeout(() => fb.classList.add('hidden'), 4000);
+      };
+    };
+  </script>
+</body>
+</html>
