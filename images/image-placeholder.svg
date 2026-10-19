@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" role="img" aria-labelledby="title description">
+  <title id="title">Image placeholder</title>
+  <desc id="description">A pink heart over a soft gradient, ready to be replaced with a personal photo.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a2030"/>
+      <stop offset="1" stop-color="#17171d"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop offset="0" stop-color="#ff7597" stop-opacity=".28"/>
+      <stop offset="1" stop-color="#ff7597" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#background)"/>
+  <circle cx="400" cy="360" r="300" fill="url(#glow)"/>
+  <path d="M400 545 228 383c-91-86-28-232 83-232 44 0 73 21 89 54 16-33 45-54 89-54 111 0 174 146 83 232L400 545Z" fill="#ff7597" opacity=".9"/>
+  <circle cx="400" cy="360" r="288" fill="none" stroke="#ffffff" stroke-opacity=".12" stroke-width="2"/>
+  <text x="400" y="650" fill="#ffffff" fill-opacity=".82" font-family="Arial, sans-serif" font-size="30" text-anchor="middle" letter-spacing="4">THAY ẢNH TẠI ĐÂY</text>
+</svg>

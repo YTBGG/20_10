@@ -193,7 +193,7 @@
       <span id="loveTimerText" class="font-bold text-accent tracking-wide">...</span>
     </div>
 
-    <!-- Cụm nút Công cụ: Đổi màu Theme & Mở Customizer -->
+    <!-- Cụm nút công cụ -->
     <div class="flex items-center gap-2">
       <button id="themeToggleBtn" title="Đổi màu Hồng lãng mạn / Xanh Spotify" class="px-3 py-2 rounded-full bg-[#1f1f27] hover:bg-[#2a2a35] border border-white/10 text-xs font-semibold flex items-center gap-1.5 transition">
         <span class="w-2.5 h-2.5 rounded-full bg-accent inline-block"></span>
@@ -205,10 +205,6 @@
         <span>Quà 20/10</span>
       </button>
 
-      <button id="openCustomDrawerBtn" title="Chỉnh sửa nhanh ảnh, nhạc, lời chúc" class="p-2 sm:px-3 sm:py-2 rounded-full bg-white/10 hover:bg-white/20 text-xs font-medium flex items-center gap-1.5 transition">
-        <i class="fa-solid fa-sliders text-accent"></i>
-        <span class="hidden lg:inline">Custom Nhanh</span>
-      </button>
     </div>
   </header>
 
@@ -244,7 +240,7 @@
             <div class="vinyl-shine absolute inset-0 rounded-full pointer-events-none"></div>
             <!-- Nhãn tâm đĩa (Ảnh Avatar của Ebe) -->
             <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-4 border-[#1f1f24] shadow-lg relative z-10">
-              <img id="vinylAvatar" src="" alt="Ebe Avatar" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/300x300/ff7597/ffffff?text=Ebe+%E2%9D%A4'" />
+              <img id="vinylAvatar" src="./images/image-placeholder.svg" alt="Ebe Avatar" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='./images/image-placeholder.svg'" />
               <!-- Lỗ trục giữa đĩa -->
               <div class="w-3.5 h-3.5 rounded-full bg-[#121212] border border-white/30 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
             </div>
@@ -330,7 +326,7 @@
       <!-- Banner Album "Spotify Artist / Exclusive Wrapped" -->
       <div class="rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-[#2b1620] via-[#1c1a24] to-[#141418] border border-white/10 shadow-2xl flex flex-col sm:flex-row items-center sm:items-end gap-6 relative overflow-hidden">
         <div class="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/15 shrink-0 relative group">
-          <img id="albumCoverImg" src="" alt="Album Cover" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/400x400/ff7597/ffffff?text=20/10+Ebe'" />
+          <img id="albumCoverImg" src="./images/image-placeholder.svg" alt="Album Cover" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.onerror=null; this.src='./images/image-placeholder.svg'" />
           <div class="absolute bottom-2 right-2 bg-black/70 backdrop-blur-md px-2 py-0.5 rounded-md text-[10px] font-bold text-accent">
             11/09/2025
           </div>
@@ -350,7 +346,7 @@
 
           <div class="mt-4 flex flex-wrap items-center justify-center sm:justify-start gap-3 text-xs text-zinc-300">
             <span class="bg-white/10 px-3 py-1 rounded-full font-semibold">
-              <i class="fa-solid fa-user-pen text-accent mr-1"></i>Tạo bởi: <strong class="sender-name-bind text-white">Anh</strong>
+              <i class="fa-solid fa-user-pen text-accent mr-1"></i>Tạo bởi: <strong class="sender-name-bind text-white">Bel</strong>
             </span>
             <span class="bg-white/10 px-3 py-1 rounded-full font-semibold">
               <i class="fa-solid fa-calendar-check text-accent mr-1"></i>Kỷ niệm: <strong>11/09/2025</strong>
@@ -373,7 +369,7 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center bg-[#121216] p-4 rounded-2xl border border-white/5">
           <div class="sm:col-span-4 aspect-square sm:aspect-[4/3] rounded-xl overflow-hidden bg-zinc-800">
-            <img id="spotlightImg" src="" alt="Memory Photo" class="w-full h-full object-cover transition duration-500 hover:scale-105" onerror="this.src='https://placehold.co/400x300/27272a/ff7597?text=K%E1%BB%B7+Ni%E1%BB%87m+%E2%9D%A4'" />
+            <img id="spotlightImg" src="./images/image-placeholder.svg" alt="Memory Photo" class="w-full h-full object-cover transition duration-500 hover:scale-105" onerror="this.onerror=null; this.src='./images/image-placeholder.svg'" />
           </div>
           <div class="sm:col-span-8 space-y-2">
             <h3 id="spotlightTitle" class="text-base sm:text-lg font-bold text-white"></h3>
@@ -430,7 +426,7 @@
       </div>
 
       <div class="mt-5 flex items-center justify-between">
-        <span class="font-handwriting text-2xl text-accent">Yêu ebe rất nhiều, <span class="sender-name-bind">Anh</span> ♥</span>
+        <span class="font-handwriting text-2xl text-accent">Yêu ebe rất nhiều, <span class="sender-name-bind">Bel</span> ♥</span>
         <button id="shootHeartsFromLetterBtn" class="px-4 py-2 rounded-full bg-accent text-black font-bold text-xs shadow-accent hover:scale-105 transition">
           <i class="fa-solid fa-heart mr-1"></i> Bắn tim ngập màn hình
         </button>
@@ -465,109 +461,48 @@
     </div>
   </div>
 
-  <!-- ==================== DRAWER 3: BẢNG CUSTOM NHANH TRỰC TIẾP TRÊN WEB ==================== -->
-  <div id="customDrawer" class="fixed inset-0 z-50 hidden justify-end bg-black/70 backdrop-blur-sm">
-    <div class="bg-[#18181f] border-l border-white/15 w-full max-w-md h-full flex flex-col justify-between p-6 overflow-y-auto shadow-2xl">
-      <div class="space-y-5">
-        <div class="flex items-center justify-between border-b border-white/10 pb-4">
-          <div>
-            <h3 class="font-bold text-lg text-white flex items-center gap-2">
-              <i class="fa-solid fa-sliders text-accent"></i> Tùy Chỉnh Nhanh (Custom)
-            </h3>
-            <p class="text-xs text-zinc-400">Thay đổi nội dung trực tiếp & copy code CONFIG mới</p>
-          </div>
-          <button id="closeCustomDrawerBtn" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-
-        <div class="space-y-3 text-xs">
-          <div>
-            <label class="block text-zinc-300 font-semibold mb-1">Tên gọi thân mật của người yêu (Ebe):</label>
-            <input id="customEbeName" type="text" class="w-full px-3 py-2 rounded-xl bg-[#111115] border border-white/15 text-white focus:outline-none focus:border-pink-400" />
-          </div>
-
-          <div>
-            <label class="block text-zinc-300 font-semibold mb-1">Tên xưng hô của bạn:</label>
-            <input id="customSenderName" type="text" class="w-full px-3 py-2 rounded-xl bg-[#111115] border border-white/15 text-white focus:outline-none focus:border-pink-400" />
-          </div>
-
-          <div>
-            <label class="block text-zinc-300 font-semibold mb-1">Ngày bắt đầu yêu (YYYY-MM-DD):</label>
-            <input id="customStartDate" type="date" class="w-full px-3 py-2 rounded-xl bg-[#111115] border border-white/15 text-white focus:outline-none focus:border-pink-400" />
-          </div>
-
-          <div>
-            <label class="block text-zinc-300 font-semibold mb-1">Link Ảnh Đại Diện / Bìa Đĩa (URL):</label>
-            <input id="customAvatarUrl" type="text" placeholder="Dán link ảnh của ebe vào đây..." class="w-full px-3 py-2 rounded-xl bg-[#111115] border border-white/15 text-white focus:outline-none focus:border-pink-400" />
-          </div>
-
-          <div>
-            <label class="block text-zinc-300 font-semibold mb-1">Link Nhạc Nền MP3 (Để trống sẽ phát Music Box tự động):</label>
-            <input id="customAudioUrl" type="text" placeholder="https://.../nhac-cua-ban.mp3" class="w-full px-3 py-2 rounded-xl bg-[#111115] border border-white/15 text-white focus:outline-none focus:border-pink-400" />
-          </div>
-
-          <div>
-            <label class="block text-zinc-300 font-semibold mb-1">Tâm thư 20/10 đầy đủ:</label>
-            <textarea id="customFullLetter" rows="5" class="w-full px-3 py-2 rounded-xl bg-[#111115] border border-white/15 text-white focus:outline-none focus:border-pink-400"></textarea>
-          </div>
-        </div>
-      </div>
-
-      <div class="pt-4 border-t border-white/10 space-y-2 mt-6">
-        <button id="applyCustomBtn" class="w-full py-2.5 rounded-xl bg-accent text-black font-bold text-xs shadow-accent hover:opacity-95 transition">
-          <i class="fa-solid fa-check mr-1"></i> Áp Dụng Ngay Lên Giao Diện
-        </button>
-        <button id="copyConfigCodeBtn" class="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-xs transition flex items-center justify-center gap-1.5">
-          <i class="fa-regular fa-copy"></i> Copy Đoạn Code CONFIG Đã Sửa
-        </button>
-        <p id="copyFeedbackText" class="text-[11px] text-center text-emerald-400 hidden">Đã copy CONFIG vào bộ nhớ tạm! Bạn chỉ cần dán đè vào đầu thẻ script.</p>
-      </div>
-    </div>
-  </div>
-
   <!-- ========================================================================= -->
-  <!-- PHẦN CẤU HÌNH DỄ CUSTOM NHẤT (CHỈ CẦN SỬA NỘI DUNG TRONG BIẾN CONFIG NÀY) -->
+  <!-- CẤU HÌNH NỘI DUNG TRANG -->
   <!-- ========================================================================= -->
   <script>
     /**
-     * 💡 HƯỚNG DẪN TỰ SỬA NỘI DUNG (CUSTOM):
-     * Bạn chỉ cần thay đổi chữ, link ảnh, hoặc lời chúc nằm trong dấu ngoặc kép "" bên dưới.
-     * Hoặc bấm nút "Custom Nhanh" ở góc phải trên cùng của trang web để sửa trực tiếp!
+     * Chỉnh lời nhắn ở letterLines, fullLetter và nội dung note trong tracks.
+     * Dùng đường dẫn tương đối ./images/ten-anh.jpg cho ảnh và ./nhac/ten-bai.mp3 cho nhạc.
+     * Để audioUrl trống nếu muốn dùng Music Box mặc định.
      */
     const CONFIG = {
       // 1. Tên gọi thân mật của người yêu và của bạn
       ebeName: "Ebe",
-      senderName: "Anh",
+      senderName: "Bel",
 
       // 2. Ngày hai bạn bắt đầu quen nhau (Định dạng: Năm-Tháng-Ngày -> 11/09/2025)
       startDate: "2025-09-11",
 
-      // 3. Link ảnh đại diện ở tâm đĩa than & bìa Album (Bạn có thể thay bằng link ảnh của ebe)
-      avatarUrl: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=800&q=80",
+      // 3. Ảnh đại diện và bìa album (đổi sang ảnh trong thư mục images khi sẵn sàng)
+      avatarUrl: "./images/image-placeholder.svg",
 
-      // 4. Link nhạc MP3 (Nếu để trống "" hoặc link lỗi, web sẽ tự động đánh đàn Music Box lãng mạn)
+      // 4. Đường dẫn MP3 tương đối; để trống để phát Music Box tự động
       audioUrl: "",
 
-      // 5. Các câu Lyrics (Lời chúc 20/10 chạy từng dòng như Spotify)
+      // 5. Tin nhắn dạng lyrics hiển thị từng dòng
       letterLines: [
-        "🎵 Gửi ebe nhỏ đáng yêu nhất của anh...",
+        "🎵 Gửi ebe nhỏ đáng yêu nhất của bel...",
         "Từ ngày 11/09/2025 định mệnh ấy,",
-        "Thế giới của anh bỗng có thêm một mặt trời nhỏ.",
+        "Thế giới của bel bỗng có thêm một mặt trời nhỏ.",
         "Hôm nay là 20/10 — ngày đặc biệt của riêng ebe,",
-        "Chúc công chúa của anh luôn cười tươi 100 điểm,",
+        "Chúc công chúa của bel luôn cười tươi 100 điểm,",
         "Mọi muộn phiền đều tan biến ngoài cánh cửa,",
         "Mỗi ngày trôi qua đều được yêu thương và chiều chuộng.",
-        "Cảm ơn ebe vì đã đến và làm cuộc sống của anh rực rỡ hơn!",
-        "Happy Vietnamese Women's Day 20/10, ebe của anh ♥"
+        "Cảm ơn ebe vì đã đến và làm cuộc sống của bel rực rỡ hơn!",
+        "Happy Vietnamese Women's Day 20/10, ebe của bel ♥"
       ],
 
       // 6. Toàn bộ bức tâm thư khi bấm "Mở toàn bộ tâm thư"
-      fullLetter: `Gửi ebe bé bỏng của anh,
+      fullLetter: `Gửi ebe bé bỏng của bel,
 
-Vậy là tụi mình đã đi cùng nhau từ cột mốc 11/09/2025. Mỗi ngày có ebe bên cạnh đều là một bản nhạc thật êm dịu và hạnh phúc mà anh muốn bấm nút Repeat mãi không thôi.
+Vậy là tụi mình đã đi cùng nhau từ cột mốc 11/09/2025. Mỗi ngày có ebe bên cạnh đều là một bản nhạc thật êm dịu và hạnh phúc mà bel muốn bấm nút Repeat mãi không thôi.
 
-Nhân ngày Phụ nữ Việt Nam 20/10, anh chúc ebe của anh luôn giữ được nụ cười tỏa nắng, luôn bình an, xinh đẹp và tự tin làm những điều mình thích. Dù ngoài kia có bận rộn thế nào, về bên anh thì ebe cứ yên tâm làm em bé được cưng chiều nhất nhé.
+Nhân ngày Phụ nữ Việt Nam 20/10, bel chúc ebe của bel luôn giữ được nụ cười tỏa nắng, luôn bình an, xinh đẹp và tự tin làm những điều mình thích. Dù ngoài kia có bận rộn thế nào, về bên bel thì ebe cứ yên tâm làm em bé được cưng chiều nhất nhé.
 
 Thương ebe rất nhiều!`,
 
@@ -576,42 +511,42 @@ Thương ebe rất nhiều!`,
         {
           id: 1,
           title: "Ngày đầu tiên: 11/09/2025",
-          subtitle: "Khởi đầu hành trình bên ebe",
+          subtitle: "Ngày bel dính tiếng sét ái tình :))",
           duration: "11:09",
-          note: "Ngày 11/09/2025 — ngày câu chuyện của tụi mình chính thức bắt đầu. Khoảnh khắc ấy đến giờ nghĩ lại vẫn làm tim anh đập nhanh như nhịp nhạc này vậy.",
-          image: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=800&q=80"
+          note: "Ngày 11/09/2025 — ngày mà ebe tặng quà sinh nhật cho bel, tự nhiên thấy cũng dui dui tại có ng đẹp z mà tặng quà cho mình hehehe",
+          image: "./images/image-placeholder.svg"
         },
         {
           id: 2,
           title: "Nụ cười 100 điểm của ebe",
-          subtitle: "Giai điệu chữa lành mọi mệt mỏi",
+          subtitle: "ebe dth",
           duration: "∞",
-          note: "Chỉ cần nhìn thấy ebe cười tít mắt là bao nhiêu áp lực hay mệt mỏi trong ngày của anh đều bay biến sạch sẽ. Nụ cười 1000 điểm không có nhưng!",
-          image: "https://images.unsplash.com/photo-1494774157365-9e04c6720e47?auto=format&fit=crop&w=800&q=80"
+          note: "Nụ cười của ebe đáng iu lắm á",
+          image: "./images/image-placeholder.svg"
         },
         {
           id: 3,
-          title: "Những lúc ebe dỗi cute xỉu",
+          title: "Những lúc ebe dỗi",
           subtitle: "Dỗi nhưng vẫn thương",
           duration: "05:20",
-          note: "Có những lúc ebe phụng phịu giận dỗi nhìn vừa thương vừa buồn cười. Dỗi một xíu thôi rồi để anh dỗ dành bằng trà sữa và đồ ăn ngon nha!",
-          image: "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=800&q=80"
+          note: "Những lúc ebe dỗi á, ebe dỗi chút hui ùi bel dỗ dỗ bằng cách hôn hôn, ôm ôm, nựng nựng, cưng cưng, iu iu, mua món ebe thích nè:3",
+          image: "./images/image-placeholder.svg"
         },
         {
           id: 4,
-          title: "20/10 vạn điều rực rỡ & bình an",
-          subtitle: "Bản nhạc dành riêng cho ngày hôm nay",
+          title: "20/10 vạn điều rực rỡ & bình an !",
+          subtitle: "Chúc ebe ngày 20/10 nè",
           duration: "20:10",
-          note: "Chúc ebe ngày 20/10 ngập tràn hoa, quà, niềm vui và những điều ngọt ngào nhất. Ebe xứng đáng với tất cả những điều tuyệt vời nhất thế gian!",
-          image: "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=800&q=80"
+          note: "Chúc ebe ngày 20/10 cũng là ngày mà ebe đáng được tôn trọng, được yêu thương, được cưng chiều và được hạnh phúc nhất trên đời nè. Chúc ebe luôn bình an, vui vẻ, xinh đẹp và rực rỡ như ánh mặt trời nhé!",
+          image: "./images/image-placeholder.svg"
         },
         {
           id: 5,
           title: "Hành trình phía trước cùng ebe",
-          subtitle: "Repeat mãi mãi",
+          subtitle: "Vĩnh Viễn",
           duration: "3000",
-          note: "Từ 11/09/2025 đến nhiều năm sau nữa, mình cùng nhau viết thêm thật nhiều track nhạc mới, đi ăn thật nhiều món ngon và chụp thật nhiều ảnh đẹp nhé!",
-          image: "https://images.unsplash.com/photo-1474552226712-ac0f0961a954?auto=format&fit=crop&w=800&q=80"
+          note: "Từ ngày hôm nay đến nhiều năm sau nữa, mình cùng nhau viết thêm thật nhiều kỷ niệm đẹp, cùng nhau đi qua mọi vui buồn, cùng nhau trưởng thành và cùng nhau hạnh phúc nhé ebe đáng iu của bell!",
+          image: "./images/image-placeholder.svg"
         }
       ],
 
@@ -621,7 +556,7 @@ Thương ebe rất nhiều!`,
           id: "v1",
           icon: "fa-mug-hot",
           title: "Voucher 1 Chầu Trà Sữa & Đồ Ăn Vặt Full Topping",
-          desc: "Ebe chỉ việc chọn quán, mọi thứ còn lại để anh lo hết!"
+          desc: "Ebe chỉ việc chọn quán, mọi thứ còn lại để bel lo hết!"
         },
         {
           id: "v2",
@@ -633,7 +568,7 @@ Thương ebe rất nhiều!`,
           id: "v3",
           icon: "fa-heart-circle-bolt",
           title: "Voucher 1000 Cái Ôm Ấm Áp Miễn Phí",
-          desc: "Quy đổi bất cứ lúc nào ebe thấy mệt hoặc nhớ anh."
+          desc: "Quy đổi bất cứ lúc nào ebe thấy mệt hoặc nhớ bel nè."
         }
       ]
     };
@@ -776,7 +711,7 @@ Thương ebe rất nhiều!`,
                 ? '<div class="flex items-end justify-center gap-0.5 h-4"><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span></div>'
                 : index + 1}
             </div>
-            <img src="${track.image}" alt="${track.title}" class="w-11 h-11 rounded-xl object-cover shrink-0 border border-white/10" onerror="this.src='https://placehold.co/100x100/27272a/ff7597?text=Ebe'" />
+            <img src="${track.image}" alt="${track.title}" class="w-11 h-11 rounded-xl object-cover shrink-0 border border-white/10" onerror="this.onerror=null; this.src='./images/image-placeholder.svg'" />
             <div class="min-w-0">
               <p class="font-bold text-sm truncate ${isCurrent ? 'text-accent' : 'text-white'}">${track.title}</p>
               <p class="text-xs text-zinc-400 truncate">${track.subtitle || (`Dành tặng ${CONFIG.ebeName}`)}</p>
@@ -1079,52 +1014,6 @@ Thương ebe rất nhiều!`,
         giftModal.classList.remove('flex');
       };
 
-      // Bảng Custom Nhanh (Quick Customizer Drawer)
-      const customDrawer = document.getElementById('customDrawer');
-      document.getElementById('openCustomDrawerBtn').onclick = () => {
-        document.getElementById('customEbeName').value = CONFIG.ebeName;
-        document.getElementById('customSenderName').value = CONFIG.senderName;
-        document.getElementById('customStartDate').value = CONFIG.startDate;
-        document.getElementById('customAvatarUrl').value = CONFIG.avatarUrl;
-        document.getElementById('customAudioUrl').value = CONFIG.audioUrl;
-        document.getElementById('customFullLetter').value = CONFIG.fullLetter;
-        customDrawer.classList.remove('hidden');
-        customDrawer.classList.add('flex');
-      };
-      document.getElementById('closeCustomDrawerBtn').onclick = () => {
-        customDrawer.classList.add('hidden');
-        customDrawer.classList.remove('flex');
-      };
-
-      // Áp dụng Custom Nhanh
-      document.getElementById('applyCustomBtn').onclick = () => {
-        CONFIG.ebeName = document.getElementById('customEbeName').value.trim() || "Ebe";
-        CONFIG.senderName = document.getElementById('customSenderName').value.trim() || "Anh";
-        CONFIG.startDate = document.getElementById('customStartDate').value || "2025-09-11";
-        CONFIG.avatarUrl = document.getElementById('customAvatarUrl').value.trim() || CONFIG.avatarUrl;
-        CONFIG.audioUrl = document.getElementById('customAudioUrl').value.trim();
-        CONFIG.fullLetter = document.getElementById('customFullLetter').value;
-
-        renderAllFromConfig();
-        spawnFloatingHearts(15);
-        customDrawer.classList.add('hidden');
-        customDrawer.classList.remove('flex');
-      };
-
-      // Copy đoạn code CONFIG đã sửa vào clipboard
-      document.getElementById('copyConfigCodeBtn').onclick = () => {
-        const exportCode = `const CONFIG = ${JSON.stringify(CONFIG, null, 2)};`;
-        const tempInput = document.createElement('textarea');
-        tempInput.value = exportCode;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand('copy');
-        document.body.removeChild(tempInput);
-
-        const fb = document.getElementById('copyFeedbackText');
-        fb.classList.remove('hidden');
-        setTimeout(() => fb.classList.add('hidden'), 4000);
-      };
     };
   </script>
 </body>
