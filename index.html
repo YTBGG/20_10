@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
   <title>Ebeify 20/10 - Album Độc Quyền Dành Tặng Ebe</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -165,6 +166,27 @@
 </head>
 <body class="min-h-screen flex flex-col selection:bg-pink-500 selection:text-white relative">
 
+  <div id="loginGate" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#0f0f12] p-4">
+    <form id="loginForm" class="w-full max-w-md rounded-3xl border border-white/10 bg-[#18181c] p-6 sm:p-8 shadow-2xl">
+      <div class="text-center">
+        <div class="mx-auto w-14 h-14 rounded-full bg-accent flex items-center justify-center text-black text-2xl shadow-accent">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <h1 class="mt-5 text-2xl font-extrabold text-white">Album riêng tư</h1>
+        <p class="mt-2 text-sm text-zinc-400">Đăng nhập bằng tài khoản được chia sẻ riêng để xem album.</p>
+      </div>
+      <label class="block mt-6 text-sm text-zinc-300">Email
+        <input id="loginEmail" type="email" autocomplete="username" required class="mt-1 w-full rounded-xl bg-[#0c0c10] border border-white/15 px-3 py-3 text-sm text-white outline-none focus:border-pink-400" />
+      </label>
+      <label class="block mt-4 text-sm text-zinc-300">Mật khẩu
+        <input id="loginPassword" type="password" autocomplete="current-password" required class="mt-1 w-full rounded-xl bg-[#0c0c10] border border-white/15 px-3 py-3 text-sm text-white outline-none focus:border-pink-400" />
+      </label>
+      <button id="loginSubmitBtn" type="submit" class="mt-5 w-full rounded-xl bg-accent px-4 py-3 font-bold text-black hover:brightness-110">Đăng nhập</button>
+      <p id="loginStatus" class="mt-4 min-h-5 text-sm text-zinc-400" role="status" aria-live="polite">Đang kiểm tra phiên đăng nhập...</p>
+    </form>
+  </div>
+
+  <div id="protectedApp" class="hidden">
   <!-- Canvas hạt tim bay & pháo giấy -->
   <canvas id="fxCanvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
 
@@ -180,14 +202,14 @@
       <div>
         <div class="flex items-center gap-2">
           <span class="font-extrabold tracking-tight text-lg">Ebeify</span>
-          <span class="text-[11px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/10 text-accent font-semibold border border-white/10">20/10 Special</span>
+          <span class="hidden sm:inline-flex text-[11px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/10 text-accent font-semibold border border-white/10">20/10 Special</span>
         </div>
         <p class="text-xs text-zinc-400 hidden sm:block">Trình phát nhạc & lưu trữ kỷ niệm độc quyền của <span class="ebe-name-bind text-white font-medium">Ebe</span></p>
       </div>
     </div>
 
     <!-- Bộ đếm ngày yêu Realtime (Từ 11/09/2025) -->
-    <div class="flex items-center gap-2 bg-[#1c1c22] border border-white/10 px-3.5 py-1.5 rounded-full text-xs sm:text-sm shadow-inner">
+    <div class="hidden sm:flex items-center gap-2 bg-[#1c1c22] border border-white/10 px-3.5 py-1.5 rounded-full text-xs sm:text-sm shadow-inner">
       <i class="fa-solid fa-heart text-accent animate-pulse"></i>
       <span class="text-zinc-300 hidden md:inline">Bên nhau từ <strong id="startDateDisplay" class="text-white">11/09/2025</strong>:</span>
       <span id="loveTimerText" class="font-bold text-accent tracking-wide">...</span>
@@ -200,9 +222,18 @@
         <span class="hidden sm:inline" id="themeLabel">Tone Hồng</span>
       </button>
 
-      <button id="openGiftModalBtn" class="px-3.5 py-2 rounded-full bg-accent text-black font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-accent transition transform hover:scale-105">
+      <button id="openPhotoManagerBtn" class="px-3 py-2 rounded-full bg-[#1f1f27] hover:bg-[#2a2a35] border border-white/10 text-xs font-semibold flex items-center gap-1.5 transition">
+        <i class="fa-solid fa-images text-accent"></i>
+        <span class="hidden sm:inline">Thư viện ảnh</span>
+      </button>
+
+      <button id="openGiftModalBtn" title="Mở quà 20/10" aria-label="Mở quà 20/10" class="px-3.5 py-2 rounded-full bg-accent text-black font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-accent transition transform hover:scale-105">
         <i class="fa-solid fa-gift"></i>
-        <span>Quà 20/10</span>
+        <span class="hidden sm:inline">Quà 20/10</span>
+      </button>
+
+      <button id="appSignOutBtn" title="Đăng xuất" aria-label="Đăng xuất" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/15 text-zinc-200 flex items-center justify-center">
+        <i class="fa-solid fa-right-from-bracket"></i>
       </button>
 
     </div>
@@ -462,12 +493,59 @@
   </div>
 
   <!-- ========================================================================= -->
+  <!-- ==================== MODAL 3: THƯ VIỆN ẢNH DÙNG CHUNG ==================== -->
+  <div id="photoManagerModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-5">
+    <section class="bg-[#18181f] border border-white/15 rounded-3xl max-w-6xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="photoManagerTitle">
+      <header class="flex items-start justify-between gap-4 p-5 sm:p-6 border-b border-white/10">
+        <div>
+          <h2 id="photoManagerTitle" class="text-xl sm:text-2xl font-extrabold text-white">Thư viện ảnh</h2>
+          <p class="text-xs sm:text-sm text-zinc-400 mt-1">Lưu ảnh dùng chung, rồi chọn ảnh đại diện/bìa album hoặc từng kỷ niệm.</p>
+        </div>
+        <button id="closePhotoManagerBtn" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-zinc-300 shrink-0" aria-label="Đóng thư viện ảnh">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </header>
+
+      <div class="p-4 sm:p-6 overflow-y-auto space-y-5">
+        <div id="photoManagerStatus" class="rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-zinc-300" role="status" aria-live="polite">
+          Đang kết nối thư viện ảnh...
+        </div>
+
+        <div id="photoAuthPanel" class="rounded-2xl bg-[#121217] border border-white/10 p-4 sm:p-5">
+          <p id="photoAdminSession" class="text-xs text-zinc-400"></p>
+        </div>
+
+        <div id="photoUploadPanel" class="hidden">
+          <input id="photoFileInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple class="hidden" />
+          <button id="photoDropzone" type="button" class="w-full rounded-2xl border-2 border-dashed border-white/20 hover:border-pink-400 bg-white/[0.03] px-5 py-8 text-center transition">
+            <i class="fa-solid fa-cloud-arrow-up text-3xl text-accent"></i>
+            <span class="block mt-3 font-bold text-white">Thả ảnh vào đây hoặc bấm để chọn</span>
+            <span class="block mt-1 text-xs text-zinc-400">JPG, PNG, WebP hoặc GIF · tối đa 15 MB mỗi ảnh</span>
+          </button>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between gap-3 mb-3">
+            <h3 class="font-bold text-white">Ảnh đã tải lên</h3>
+            <span id="photoLibraryCount" class="text-xs text-zinc-400">0 ảnh</span>
+          </div>
+          <div id="photoLibraryGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            <p class="col-span-full text-sm text-zinc-500 py-4">Chưa có ảnh trong thư viện.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  </div>
+
   <!-- CẤU HÌNH NỘI DUNG TRANG -->
   <!-- ========================================================================= -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     /**
      * Chỉnh lời nhắn ở letterLines, fullLetter và nội dung note trong tracks.
-     * Dùng đường dẫn tương đối ./images/ten-anh.jpg cho ảnh và ./nhac/ten-bai.mp3 cho nhạc.
+     * Dùng đường dẫn tương đối tới tệp có thật trong ./images/ hoặc ./nhac/.
      * Để audioUrl trống nếu muốn dùng Music Box mặc định.
      */
     const CONFIG = {
@@ -478,8 +556,8 @@
       // 2. Ngày hai bạn bắt đầu quen nhau (Định dạng: Năm-Tháng-Ngày -> 11/09/2025)
       startDate: "2025-09-11",
 
-      // 3. Ảnh đại diện và bìa album (đổi sang ảnh trong thư mục images khi sẵn sàng)
-      avatarUrl: "./images/her.png",
+      // 3. Ảnh cá nhân chỉ được lấy từ Supabase sau khi đăng nhập
+      avatarUrl: "./images/image-placeholder.svg",
 
       // 4. Đường dẫn MP3 tương đối; để trống để phát Music Box tự động
       audioUrl: "",
@@ -514,7 +592,7 @@ Thương ebe rất nhiều!`,
           subtitle: "Ngày bel dính tiếng sét ái tình :))",
           duration: "11:09",
           note: "Ngày 11/09/2025 — ngày mà ebe tặng quà sinh nhật cho bel, tự nhiên thấy cũng dui dui tại có ng đẹp z mà tặng quà cho mình hehehe",
-          image: "./images/firstday.png"
+          image: "./images/image-placeholder.svg"
         },
         {
           id: 2,
@@ -577,6 +655,20 @@ Thương ebe rất nhiều!`,
     // LOGIC VẬN HÀNH TRÌNH PHÁT NHẠC, BỘ ĐẾM NGÀY YÊU & HIỆU ỨNG
     // =========================================================================
 
+    const PHOTO_CONFIG = {
+      supabaseUrl: "https://jpdjyebzlpxwdzvrsrql.supabase.co",
+      supabaseAnonKey: "sb_publishable__-89B4szx6hd79FGoAL4kg_OzkrFM1G",
+      bucket: "site-photos",
+      maxFileSize: 15 * 1024 * 1024,
+      signedUrlLifetimeSeconds: 300
+    };
+
+    let photoClient = null;
+    let photoSession = null;
+    let photoRecords = [];
+    const photoUrlCache = new Map();
+    let renderedAuthenticatedApp = false;
+    let photoSettings = { avatar_photo_id: null, track_photo_ids: {} };
     let currentTrackIndex = 0;
     let isPlaying = false;
     let progressPercent = 0;
@@ -711,7 +803,7 @@ Thương ebe rất nhiều!`,
                 ? '<div class="flex items-end justify-center gap-0.5 h-4"><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span></div>'
                 : index + 1}
             </div>
-            <img src="${track.image}" alt="${track.title}" class="w-11 h-11 rounded-xl object-cover shrink-0 border border-white/10" onerror="this.onerror=null; this.src='./images/image-placeholder.svg'" />
+            <img data-photo-track-id="${track.id}" src="${CONFIG.tracks[index].image}" alt="${track.title}" class="w-11 h-11 rounded-xl object-cover shrink-0 border border-white/10" onerror="this.onerror=null; this.src='./images/image-placeholder.svg'" />
             <div class="min-w-0">
               <p class="font-bold text-sm truncate ${isCurrent ? 'text-accent' : 'text-white'}">${track.title}</p>
               <p class="text-xs text-zinc-400 truncate">${track.subtitle || (`Dành tặng ${CONFIG.ebeName}`)}</p>
@@ -743,6 +835,7 @@ Thương ebe rất nhiều!`,
       // Spotlight Card
       document.getElementById('spotlightTrackBadge').textContent = `Track #${currentTrackIndex + 1}`;
       document.getElementById('spotlightImg').src = track.image;
+      document.getElementById('spotlightImg').dataset.photoTrackId = String(track.id);
       document.getElementById('spotlightTitle').textContent = track.title;
       document.getElementById('spotlightNote').textContent = track.note;
 
@@ -950,9 +1043,562 @@ Thương ebe rất nhiều!`,
       requestAnimationFrame(animateParticles);
     }
 
+    async function getPhotoUrl(path) {
+      if (!photoClient || !photoSession) {
+        throw new Error('Đăng nhập để xem ảnh riêng tư.');
+      }
+      const cached = photoUrlCache.get(path);
+      if (cached && cached.expiresAt > Date.now()) {
+        return cached.url;
+      }
+
+      const { data, error } = await photoClient.storage.from(PHOTO_CONFIG.bucket)
+        .createSignedUrl(path, PHOTO_CONFIG.signedUrlLifetimeSeconds);
+      if (error) {
+        throw new Error(`Không tạo được liên kết ảnh riêng tư: ${error.message}`);
+      }
+      const signedUrl = {
+        url: data.signedUrl,
+        expiresAt: Date.now() + PHOTO_CONFIG.signedUrlLifetimeSeconds * 1000 - 5000
+      };
+      photoUrlCache.set(path, signedUrl);
+      return signedUrl.url;
+    }
+
+    async function setPrivateImage(image, path, expectedUserId) {
+      try {
+        const signedUrl = await getPhotoUrl(path);
+        if (photoSession?.user.id === expectedUserId && image.isConnected) {
+          image.src = signedUrl;
+          return true;
+        }
+        return false;
+      } catch (error) {
+        image.src = './images/image-placeholder.svg';
+        if (photoSession?.user.id === expectedUserId) {
+          setPhotoStatus(error.message, 'error');
+        }
+        return false;
+      }
+    }
+
+    async function applyAssignedPhotoImages() {
+      if (!photoSession) return false;
+      const userId = photoSession.user.id;
+      const imageLoads = [];
+      const avatarRecord = photoRecords.find(item => item.id === photoSettings.avatar_photo_id);
+      if (avatarRecord) {
+        imageLoads.push(
+          setPrivateImage(document.getElementById('vinylAvatar'), avatarRecord.object_path, userId),
+          setPrivateImage(document.getElementById('albumCoverImg'), avatarRecord.object_path, userId)
+        );
+      }
+
+      document.querySelectorAll('[data-photo-track-id]').forEach(image => {
+        const photoId = photoSettings.track_photo_ids[image.dataset.photoTrackId];
+        const record = photoRecords.find(item => item.id === photoId);
+        if (record) imageLoads.push(setPrivateImage(image, record.object_path, userId));
+      });
+      const results = await Promise.all(imageLoads);
+      return results.every(Boolean);
+    }
+
+    function setPhotoStatus(message, type = 'info') {
+      const status = document.getElementById('photoManagerStatus');
+      const colorClass = type === 'error'
+        ? 'text-red-200 border-red-400/30 bg-red-500/10'
+        : type === 'success'
+          ? 'text-emerald-200 border-emerald-400/30 bg-emerald-500/10'
+          : 'text-zinc-300 border-white/10 bg-white/5';
+      status.className = `rounded-xl border px-4 py-3 text-sm ${colorClass}`;
+      status.textContent = message;
+    }
+
+    function updatePhotoAuthControls() {
+      const signedIn = Boolean(photoSession);
+      document.getElementById('photoUploadPanel').classList.toggle('hidden', !signedIn);
+      const sessionLabel = document.getElementById('photoAdminSession');
+      sessionLabel.textContent = signedIn ? `Đã đăng nhập: ${photoSession.user.email}` : '';
+    }
+
+    async function refreshPhotoLibrary(showSuccess = true) {
+      if (!photoClient || !photoSession) return false;
+
+      let sessionResult;
+      try {
+        const result = await photoClient.auth.getSession();
+        sessionResult = result.data;
+        if (result.error) {
+          setPhotoStatus(`Không thể kiểm tra phiên đăng nhập: ${result.error.message}`, 'error');
+          return false;
+        }
+      } catch (error) {
+        setPhotoStatus(`Không thể kiểm tra phiên đăng nhập: ${error.message || 'lỗi mạng không xác định'}`, 'error');
+        return false;
+      }
+      photoSession = sessionResult.session;
+      updatePhotoAuthControls();
+
+      let recordsResult;
+      let settingsResult;
+      try {
+        [recordsResult, settingsResult] = await Promise.all([
+          photoClient.from('photo_library')
+            .select('id, object_path, file_name, created_at')
+            .order('created_at', { ascending: false }),
+          photoClient.from('site_photo_settings')
+            .select('avatar_photo_id, track_photo_ids')
+            .eq('id', true)
+            .single()
+        ]);
+      } catch (error) {
+        setPhotoStatus(`Không kết nối được thư viện ảnh: ${error.message || 'lỗi mạng không xác định'}`, 'error');
+        return false;
+      }
+
+      if (recordsResult.error || settingsResult.error) {
+        const error = recordsResult.error || settingsResult.error;
+        setPhotoStatus(`Không tải được thư viện ảnh: ${error.message}. Kiểm tra bảng, bucket và quyền truy cập theo hướng dẫn trong images/README.md.`, 'error');
+        return false;
+      }
+
+      photoRecords = recordsResult.data || [];
+      photoSettings = {
+        avatar_photo_id: settingsResult.data.avatar_photo_id,
+        track_photo_ids: settingsResult.data.track_photo_ids || {}
+      };
+      const libraryImagesLoaded = await renderPhotoLibrary();
+      document.getElementById('vinylAvatar').src = CONFIG.avatarUrl;
+      document.getElementById('albumCoverImg').src = CONFIG.avatarUrl;
+      renderTracklist();
+      selectTrack(currentTrackIndex, false);
+      const imagesLoaded = await applyAssignedPhotoImages();
+      if (showSuccess && imagesLoaded && libraryImagesLoaded) {
+        setPhotoStatus('Thư viện ảnh đã được đồng bộ.', 'success');
+      }
+      return true;
+    }
+
+    async function renderPhotoLibrary() {
+      const grid = document.getElementById('photoLibraryGrid');
+      const count = document.getElementById('photoLibraryCount');
+      grid.replaceChildren();
+      count.textContent = `${photoRecords.length} ảnh`;
+
+      if (photoRecords.length === 0) {
+        const emptyState = document.createElement('p');
+        emptyState.className = 'col-span-full text-sm text-zinc-500 py-4';
+        emptyState.textContent = 'Chưa có ảnh trong thư viện.';
+        grid.appendChild(emptyState);
+        return true;
+      }
+
+      const imageLoads = [];
+      photoRecords.forEach(record => {
+        const card = document.createElement('article');
+        card.className = 'rounded-2xl overflow-hidden bg-[#121217] border border-white/10';
+        const image = document.createElement('img');
+        image.src = './images/image-placeholder.svg';
+        image.alt = record.file_name;
+        image.loading = 'lazy';
+        image.className = 'w-full aspect-square object-cover bg-zinc-900';
+        image.onerror = () => {
+          image.onerror = null;
+          image.src = './images/image-placeholder.svg';
+        };
+        imageLoads.push(setPrivateImage(image, record.object_path, photoSession.user.id));
+
+        const details = document.createElement('div');
+        details.className = 'p-3 space-y-2';
+        const filename = document.createElement('p');
+        filename.className = 'text-xs text-zinc-300 truncate';
+        filename.title = record.file_name;
+        filename.textContent = record.file_name;
+
+        const avatarButton = document.createElement('button');
+        avatarButton.type = 'button';
+        avatarButton.className = 'w-full rounded-lg bg-white/10 hover:bg-white/15 px-2 py-2 text-xs font-semibold text-white';
+        avatarButton.textContent = photoSettings.avatar_photo_id === record.id ? 'Đang dùng làm ảnh đại diện / bìa album' : 'Đặt làm ảnh đại diện / bìa album';
+        avatarButton.disabled = photoSettings.avatar_photo_id === record.id;
+        avatarButton.onclick = () => savePhotoAssignment(record.id, 'avatar');
+
+        const trackRow = document.createElement('div');
+        trackRow.className = 'flex gap-2';
+        const trackSelect = document.createElement('select');
+        trackSelect.className = 'min-w-0 flex-1 rounded-lg bg-[#0c0c10] border border-white/10 px-2 py-2 text-xs text-white';
+        trackSelect.setAttribute('aria-label', `Chọn kỷ niệm cho ${record.file_name}`);
+        CONFIG.tracks.forEach(track => {
+          const option = document.createElement('option');
+          option.value = String(track.id);
+          option.textContent = `#${track.id} ${track.title}`;
+          trackSelect.appendChild(option);
+        });
+        const assignedTrack = CONFIG.tracks.find(track =>
+          photoSettings.track_photo_ids[String(track.id)] === record.id
+        );
+        if (assignedTrack) trackSelect.value = String(assignedTrack.id);
+
+        const assignButton = document.createElement('button');
+        assignButton.type = 'button';
+        assignButton.className = 'rounded-lg bg-accent px-3 py-2 text-xs font-bold text-black';
+        assignButton.textContent = 'Gán';
+        assignButton.onclick = () => savePhotoAssignment(record.id, 'track', trackSelect.value);
+
+        let deleteButton = null;
+        if (photoSession) {
+          deleteButton = document.createElement('button');
+          deleteButton.type = 'button';
+          deleteButton.className = 'w-full rounded-lg border border-red-400/30 bg-red-500/10 px-2 py-2 text-xs font-semibold text-red-200 hover:bg-red-500/20';
+          deleteButton.textContent = 'Xóa ảnh';
+          deleteButton.setAttribute('aria-label', `Xóa ảnh ${record.file_name}`);
+          deleteButton.onclick = () => deletePhoto(record);
+        }
+
+        trackRow.append(trackSelect, assignButton);
+        details.append(filename, avatarButton, trackRow);
+        if (deleteButton) details.appendChild(deleteButton);
+        card.append(image, details);
+        grid.appendChild(card);
+      });
+      const results = await Promise.all(imageLoads);
+      return results.every(Boolean);
+    }
+
+    async function savePhotoAssignment(photoId, target, trackId) {
+      if (!photoClient || !photoSession) {
+        setPhotoStatus('Bạn cần đăng nhập quản trị để thay đổi ảnh.', 'error');
+        return;
+      }
+
+      const updatedSettings = {
+        avatar_photo_id: photoSettings.avatar_photo_id,
+        track_photo_ids: { ...photoSettings.track_photo_ids }
+      };
+      if (target === 'avatar') {
+        updatedSettings.avatar_photo_id = photoId;
+      } else {
+        updatedSettings.track_photo_ids[String(trackId)] = photoId;
+      }
+
+      try {
+        const { error } = await photoClient.from('site_photo_settings')
+          .update(updatedSettings)
+          .eq('id', true)
+          .select('id')
+          .single();
+        if (error) {
+          setPhotoStatus(`Không lưu được lựa chọn ảnh: ${error.message}`, 'error');
+          return;
+        }
+      } catch (error) {
+        setPhotoStatus(`Không lưu được lựa chọn ảnh: ${error.message || 'lỗi mạng không xác định'}`, 'error');
+        return;
+      }
+      if (!await refreshPhotoLibrary()) return;
+      setPhotoStatus('Đã lưu ảnh dùng chung cho trang.', 'success');
+    }
+
+    async function deletePhoto(record) {
+      if (!photoClient || !photoSession) {
+        setPhotoStatus('Bạn cần đăng nhập quản trị để xóa ảnh.', 'error');
+        return;
+      }
+      if (!window.confirm(`Xóa "${record.file_name}" khỏi thư viện ảnh? Ảnh này sẽ bị gỡ khỏi trang.`)) return;
+
+      setPhotoStatus(`Đang xóa ${record.file_name}...`);
+      let libraryRecordDeleted = false;
+      try {
+        const { data: deletedRecords, error: recordError } = await photoClient.from('photo_library')
+          .delete()
+          .eq('id', record.id)
+          .select('id');
+        if (recordError) {
+          setPhotoStatus(`Không xóa được ảnh khỏi thư viện: ${recordError.message}. Kiểm tra quyền xóa trong Supabase.`, 'error');
+          return;
+        }
+        if (!deletedRecords?.length) {
+          setPhotoStatus('Supabase chưa cho phép xóa bản ghi ảnh. Chạy lại phần SQL thiết lập trong images/README.md để cấp quyền DELETE, rồi thử lại.', 'error');
+          return;
+        }
+        libraryRecordDeleted = true;
+
+        const updatedSettings = {
+          avatar_photo_id: photoSettings.avatar_photo_id === record.id
+            ? null
+            : photoSettings.avatar_photo_id,
+          track_photo_ids: { ...photoSettings.track_photo_ids }
+        };
+        Object.keys(updatedSettings.track_photo_ids).forEach(trackId => {
+          if (updatedSettings.track_photo_ids[trackId] === record.id) {
+            delete updatedSettings.track_photo_ids[trackId];
+          }
+        });
+        const hasAssignments = updatedSettings.avatar_photo_id !== photoSettings.avatar_photo_id
+          || Object.keys(updatedSettings.track_photo_ids).length !== Object.keys(photoSettings.track_photo_ids).length;
+
+        if (hasAssignments) {
+          const { error: settingsError } = await photoClient.from('site_photo_settings')
+            .update(updatedSettings)
+            .eq('id', true)
+            .select('id')
+            .single();
+          if (settingsError) {
+            setPhotoStatus(`Bản ghi đã bị xóa nhưng không cập nhật được ảnh đang gán: ${settingsError.message}. Cần đồng bộ lại cấu hình ảnh.`, 'error');
+            await refreshPhotoLibrary(false);
+            return;
+          }
+          photoSettings = updatedSettings;
+        }
+
+        const { error: storageError } = await photoClient.storage.from(PHOTO_CONFIG.bucket)
+          .remove([record.object_path]);
+        if (storageError) {
+          setPhotoStatus(`Ảnh đã được gỡ khỏi thư viện nhưng không xóa được tệp trong Storage: ${storageError.message}. Kiểm tra quyền DELETE của bucket trong Supabase.`, 'error');
+          await refreshPhotoLibrary(false);
+          return;
+        }
+        const folderPath = record.object_path.split('/').slice(0, -1).join('/');
+        const fileName = record.object_path.split('/').pop();
+        const { data: remainingFiles, error: verifyStorageError } = await photoClient.storage
+          .from(PHOTO_CONFIG.bucket)
+          .list(folderPath, { search: fileName, limit: 10 });
+        if (verifyStorageError || remainingFiles?.some(file => file.name === fileName)) {
+          const reason = verifyStorageError?.message || 'Storage vẫn còn tệp ảnh sau khi yêu cầu xóa';
+          setPhotoStatus(`Ảnh đã được gỡ khỏi thư viện nhưng chưa xác nhận xóa tệp: ${reason}. Kiểm tra quyền DELETE của bucket trong Supabase Storage.`, 'error');
+          await refreshPhotoLibrary(false);
+          return;
+        }
+      } catch (error) {
+        const action = libraryRecordDeleted
+          ? 'Bản ghi đã được gỡ khỏi thư viện nhưng cần kiểm tra lại tệp trong Storage'
+          : 'Không thể xóa ảnh';
+        setPhotoStatus(`${action}: ${error.message || 'lỗi mạng không xác định'}`, 'error');
+        await refreshPhotoLibrary(false);
+        return;
+      }
+
+      if (!await refreshPhotoLibrary(false)) return;
+      setPhotoStatus(`Đã xóa "${record.file_name}" khỏi thư viện và trang.`, 'success');
+    }
+
+    async function uploadPhotos(files) {
+      if (!photoClient || !photoSession) {
+        setPhotoStatus('Bạn cần đăng nhập quản trị trước khi tải ảnh lên.', 'error');
+        return;
+      }
+
+      const fileList = Array.from(files);
+      if (fileList.length === 0) return;
+      const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+      const results = [];
+
+      for (let index = 0; index < fileList.length; index++) {
+        const file = fileList[index];
+        if (!allowedTypes.has(file.type)) {
+          results.push(`${file.name}: định dạng không hỗ trợ`);
+          continue;
+        }
+        if (file.size > PHOTO_CONFIG.maxFileSize) {
+          results.push(`${file.name}: vượt quá 15 MB`);
+          continue;
+        }
+
+        setPhotoStatus(`Đang tải ảnh ${index + 1}/${fileList.length}: ${file.name}`);
+        const safeName = file.name.normalize('NFKD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-zA-Z0-9._-]/g, '-')
+          .replace(/-+/g, '-')
+          .slice(-100) || 'photo';
+        const objectPath = `${photoSession.user.id}/${crypto.randomUUID()}-${safeName}`;
+
+        try {
+          const { error: uploadError } = await photoClient.storage.from(PHOTO_CONFIG.bucket)
+            .upload(objectPath, file, {
+              cacheControl: '31536000',
+              contentType: file.type,
+              upsert: false
+            });
+          if (uploadError) {
+            results.push(`${file.name}: ${uploadError.message}`);
+            continue;
+          }
+
+          const { error: recordError } = await photoClient.from('photo_library').insert({
+            object_path: objectPath,
+            file_name: file.name,
+            uploaded_by: photoSession.user.id
+          });
+          if (recordError) {
+            const { error: cleanupError } = await photoClient.storage.from(PHOTO_CONFIG.bucket).remove([objectPath]);
+            results.push(`${file.name}: ${recordError.message}${cleanupError ? `; không dọn được tệp đã tải lên: ${cleanupError.message}` : ''}`);
+            continue;
+          }
+          results.push(`${file.name}: thành công`);
+        } catch (error) {
+          results.push(`${file.name}: ${error.message || 'lỗi kết nối không xác định'}`);
+        }
+      }
+
+      if (!await refreshPhotoLibrary()) return;
+      const failed = results.filter(result => !result.endsWith(': thành công'));
+      if (failed.length > 0) {
+        setPhotoStatus(`Hoàn tất ${fileList.length} ảnh; ${failed.length} ảnh chưa tải được. ${failed.join(' · ')}`, 'error');
+      } else {
+        setPhotoStatus(`Đã tải lên ${results.length} ảnh riêng tư cho album.`, 'success');
+      }
+      document.getElementById('photoFileInput').value = '';
+    }
+
+    function initializePhotoManager() {
+      const modal = document.getElementById('photoManagerModal');
+      const fileInput = document.getElementById('photoFileInput');
+      const dropzone = document.getElementById('photoDropzone');
+
+      document.getElementById('openPhotoManagerBtn').onclick = () => {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        refreshPhotoLibrary();
+      };
+      document.getElementById('closePhotoManagerBtn').onclick = () => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      };
+      dropzone.onclick = () => fileInput.click();
+      fileInput.onchange = () => uploadPhotos(fileInput.files);
+      dropzone.ondragover = event => {
+        event.preventDefault();
+        dropzone.classList.add('border-pink-400');
+      };
+      dropzone.ondragleave = () => dropzone.classList.remove('border-pink-400');
+      dropzone.ondrop = event => {
+        event.preventDefault();
+        dropzone.classList.remove('border-pink-400');
+        uploadPhotos(event.dataTransfer.files);
+      };
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
+      });
+    }
+
+    async function showAuthenticatedApp(session) {
+      photoSession = session;
+      const protectedApp = document.getElementById('protectedApp');
+      const loginGate = document.getElementById('loginGate');
+      const loginStatus = document.getElementById('loginStatus');
+      if (!PHOTO_CONFIG.supabaseUrl.trim() || !PHOTO_CONFIG.supabaseAnonKey.trim()) {
+        protectedApp.classList.add('hidden');
+        loginGate.classList.remove('hidden');
+        loginStatus.textContent = 'Đăng nhập chưa được cấu hình. Liên hệ chủ trang.';
+        return;
+      }
+
+      if (!session) {
+        if (isPlaying) togglePlayPause(false);
+        photoSession = null;
+        photoRecords = [];
+        photoSettings = { avatar_photo_id: null, track_photo_ids: {} };
+        photoUrlCache.clear();
+        protectedApp.classList.add('hidden');
+        loginGate.classList.remove('hidden');
+        loginStatus.textContent = 'Đăng nhập bằng tài khoản được chia sẻ riêng để xem album.';
+        document.getElementById('loginPassword').value = '';
+        document.getElementById('vinylAvatar').src = CONFIG.avatarUrl;
+        document.getElementById('albumCoverImg').src = CONFIG.avatarUrl;
+        document.getElementById('spotlightImg').src = './images/image-placeholder.svg';
+        document.querySelectorAll('[data-photo-track-id], #photoLibraryGrid img').forEach(image => {
+          image.src = './images/image-placeholder.svg';
+        });
+        updatePhotoAuthControls();
+        return;
+      }
+
+      loginGate.classList.add('hidden');
+      protectedApp.classList.remove('hidden');
+      updatePhotoAuthControls();
+      if (!renderedAuthenticatedApp) {
+        renderAllFromConfig();
+        renderedAuthenticatedApp = true;
+      }
+      await refreshPhotoLibrary();
+    }
+
+    function initializeAuthentication() {
+      const loginForm = document.getElementById('loginForm');
+      const submitButton = document.getElementById('loginSubmitBtn');
+      const loginStatus = document.getElementById('loginStatus');
+
+      if (!PHOTO_CONFIG.supabaseUrl.trim() || !PHOTO_CONFIG.supabaseAnonKey.trim()) {
+        loginStatus.textContent = 'Đăng nhập chưa được cấu hình. Liên hệ chủ trang.';
+        return;
+      }
+      if (!window.supabase?.createClient) {
+        loginStatus.textContent = 'Không tải được dịch vụ đăng nhập. Kiểm tra kết nối mạng rồi tải lại trang.';
+        return;
+      }
+
+      photoClient = window.supabase.createClient(
+        PHOTO_CONFIG.supabaseUrl.trim(),
+        PHOTO_CONFIG.supabaseAnonKey.trim(),
+        { auth: { autoRefreshToken: true, persistSession: true, detectSessionInUrl: false } }
+      );
+
+      loginForm.onsubmit = async event => {
+        event.preventDefault();
+        const email = document.getElementById('loginEmail').value.trim();
+        const passwordInput = document.getElementById('loginPassword');
+        submitButton.disabled = true;
+        loginStatus.textContent = 'Đang đăng nhập...';
+        try {
+          const { error } = await photoClient.auth.signInWithPassword({
+            email,
+            password: passwordInput.value
+          });
+          if (error) {
+            loginStatus.textContent = `Không đăng nhập được: ${error.message}`;
+            passwordInput.value = '';
+          } else {
+            passwordInput.value = '';
+            loginStatus.textContent = 'Đăng nhập thành công. Đang mở album...';
+          }
+        } catch (error) {
+          loginStatus.textContent = `Lỗi kết nối khi đăng nhập: ${error.message || 'vui lòng thử lại'}`;
+        } finally {
+          submitButton.disabled = false;
+        }
+      };
+
+      document.getElementById('appSignOutBtn').onclick = async () => {
+        try {
+          const { error } = await photoClient.auth.signOut();
+          if (error) {
+            setPhotoStatus(`Không đăng xuất được: ${error.message}`, 'error');
+          }
+        } catch (error) {
+          setPhotoStatus(`Không đăng xuất được: ${error.message || 'lỗi kết nối không xác định'}`, 'error');
+        }
+      };
+
+      photoClient.auth.onAuthStateChange((_event, session) => {
+        window.setTimeout(() => showAuthenticatedApp(session), 0);
+      });
+      photoClient.auth.getSession().then(({ data, error }) => {
+        if (error) {
+          loginStatus.textContent = `Không kiểm tra được phiên đăng nhập: ${error.message}`;
+          return;
+        }
+        showAuthenticatedApp(data.session);
+      }).catch(error => {
+        loginStatus.textContent = `Lỗi kết nối xác thực: ${error.message || 'vui lòng tải lại trang'}`;
+      });
+    }
+
     // 9. Sự kiện Nút bấm & Tương tác
     window.onload = function () {
-      renderAllFromConfig();
+      initializePhotoManager();
+      initializeAuthentication();
       animateParticles();
       setInterval(updateLoveCounter, 30000);
 
