@@ -147,6 +147,18 @@
       height: 5px;
       border-radius: 999px;
     }
+    #progressBar {
+      height: 18px;
+    }
+    #progressBar::-webkit-slider-runnable-track {
+      background: linear-gradient(
+        to right,
+        var(--accent) 0%,
+        var(--accent) var(--progress-percent, 0%),
+        rgba(255, 255, 255, 0.2) var(--progress-percent, 0%),
+        rgba(255, 255, 255, 0.2) 100%
+      );
+    }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
@@ -157,6 +169,24 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.6);
       margin-top: -4.5px;
       transition: transform 0.15s ease;
+    }
+    #progressBar::-moz-range-track {
+      height: 5px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+    #progressBar::-moz-range-progress {
+      height: 5px;
+      border-radius: 9999px;
+      background: var(--accent);
+    }
+    #progressBar::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border: 0;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.6);
     }
     input[type="range"]:hover::-webkit-slider-thumb {
       transform: scale(1.25);
@@ -499,7 +529,7 @@
       <header class="flex items-start justify-between gap-4 p-5 sm:p-6 border-b border-white/10">
         <div>
           <h2 id="photoManagerTitle" class="text-xl sm:text-2xl font-extrabold text-white">Thư viện ảnh</h2>
-          <p class="text-xs sm:text-sm text-zinc-400 mt-1">Lưu ảnh dùng chung, rồi chọn ảnh đại diện/bìa album hoặc từng kỷ niệm.</p>
+          <p class="text-xs sm:text-sm text-zinc-400 mt-1">Lưu ảnh dùng chung, gán ảnh đại diện, bìa/logo album hoặc từng kỷ niệm; tải ảnh về máy bất cứ lúc nào.</p>
         </div>
         <button id="closePhotoManagerBtn" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-zinc-300 shrink-0" aria-label="Đóng thư viện ảnh">
           <i class="fa-solid fa-xmark"></i>
@@ -667,8 +697,9 @@ Thương ebe rất nhiều!`,
     let photoSession = null;
     let photoRecords = [];
     const photoUrlCache = new Map();
+    let coverAssignmentSupported = true;
     let renderedAuthenticatedApp = false;
-    let photoSettings = { avatar_photo_id: null, track_photo_ids: {} };
+    let photoSettings = { avatar_photo_id: null, cover_photo_id: null, track_photo_ids: {} };
     let currentTrackIndex = 0;
     let isPlaying = false;
     let progressPercent = 0;
@@ -681,6 +712,13 @@ Thương ebe rất nhiều!`,
     let musicBoxTimer = null;
     const melodyNotes = [523.25, 659.25, 783.99, 1046.50, 880.00, 1046.50, 783.99, 659.25, 587.33, 698.46, 880.00, 1174.66, 783.99, 987.77, 1046.50];
     let noteCursor = 0;
+
+    function updateProgressBar(value) {
+      const progressBar = document.getElementById('progressBar');
+      const percent = Math.max(0, Math.min(100, Number(value) || 0));
+      progressBar.value = percent;
+      progressBar.style.setProperty('--progress-percent', `${percent}%`);
+    }
 
     function playMusicBoxNote() {
       if (!isPlaying) return;
@@ -726,6 +764,7 @@ Thương ebe rất nhiều!`,
       // Ảnh đại diện tâm đĩa & bìa album
       document.getElementById('vinylAvatar').src = CONFIG.avatarUrl;
       document.getElementById('albumCoverImg').src = CONFIG.avatarUrl;
+      updateProgressBar(progressPercent);
 
       // Nhạc nền nếu có URL
       const bgAudio = document.getElementById('bgAudio');
@@ -748,7 +787,7 @@ Thương ebe rất nhiều!`,
         p.onclick = () => {
           currentLyricIndex = idx;
           progressPercent = Math.round((idx / Math.max(1, CONFIG.letterLines.length - 1)) * 100);
-          document.getElementById('progressBar').value = progressPercent;
+          updateProgressBar(progressPercent);
           highlightLyric(idx);
         };
         lyricsBox.appendChild(p);
@@ -759,7 +798,7 @@ Thương ebe rất nhiều!`,
 
       // Render Tracklist
       renderTracklist();
-      selectTrack(currentTrackIndex, false);
+      selectTrack(currentTrackIndex);
 
       // Render Vouchers
       renderVouchers();
@@ -787,44 +826,51 @@ Thương ebe rất nhiều!`,
     // 3. Render danh sách bài hát kỷ niệm
     function renderTracklist() {
       const container = document.getElementById('tracklistContainer');
-      container.innerHTML = '';
+      if (container.children.length !== CONFIG.tracks.length) {
+        container.replaceChildren();
+        CONFIG.tracks.forEach((track, index) => {
+          const row = document.createElement('div');
+          row.dataset.trackIndex = String(index);
+          row.className = 'group flex items-center justify-between p-3 rounded-2xl cursor-pointer transition';
+          row.innerHTML = `
+            <div class="flex items-center gap-3.5 min-w-0">
+              <div data-track-number class="w-6 text-center text-xs font-bold"></div>
+              <img data-photo-track-id="${track.id}" src="${track.image}" alt="${track.title}" class="w-11 h-11 rounded-xl object-cover shrink-0 border border-white/10" onerror="this.onerror=null; this.src='./images/image-placeholder.svg'" />
+              <div class="min-w-0">
+                <p data-track-title class="font-bold text-sm truncate">${track.title}</p>
+                <p class="text-xs text-zinc-400 truncate">${track.subtitle || (`Dành tặng ${CONFIG.ebeName}`)}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 shrink-0 ml-2">
+              <span class="text-xs font-semibold text-zinc-400">${track.duration}</span>
+            </div>
+          `;
+          row.onclick = () => {
+            selectTrack(index);
+            spawnFloatingHearts(8);
+          };
+          container.appendChild(row);
+        });
+      }
 
       CONFIG.tracks.forEach((track, index) => {
         const isCurrent = index === currentTrackIndex;
-        const row = document.createElement('div');
+        const row = container.children[index];
         row.className = `group flex items-center justify-between p-3 rounded-2xl cursor-pointer transition ${
           isCurrent ? 'bg-white/10 border border-white/15' : 'hover:bg-white/5 border border-transparent'
         }`;
-
-        row.innerHTML = `
-          <div class="flex items-center gap-3.5 min-w-0">
-            <div class="w-6 text-center text-xs font-bold ${isCurrent ? 'text-accent' : 'text-zinc-400'}">
-              ${isCurrent && isPlaying
-                ? '<div class="flex items-end justify-center gap-0.5 h-4"><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span></div>'
-                : index + 1}
-            </div>
-            <img data-photo-track-id="${track.id}" src="${CONFIG.tracks[index].image}" alt="${track.title}" class="w-11 h-11 rounded-xl object-cover shrink-0 border border-white/10" onerror="this.onerror=null; this.src='./images/image-placeholder.svg'" />
-            <div class="min-w-0">
-              <p class="font-bold text-sm truncate ${isCurrent ? 'text-accent' : 'text-white'}">${track.title}</p>
-              <p class="text-xs text-zinc-400 truncate">${track.subtitle || (`Dành tặng ${CONFIG.ebeName}`)}</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-3 shrink-0 ml-2">
-            <span class="text-xs font-semibold text-zinc-400">${track.duration}</span>
-          </div>
-        `;
-
-        row.onclick = () => {
-          selectTrack(index, true);
-          spawnFloatingHearts(8);
-        };
-
-        container.appendChild(row);
+        const number = row.querySelector('[data-track-number]');
+        number.className = `w-6 text-center text-xs font-bold ${isCurrent ? 'text-accent' : 'text-zinc-400'}`;
+        number.innerHTML = isCurrent && isPlaying
+          ? '<div class="flex items-end justify-center gap-0.5 h-4"><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span></div>'
+          : String(index + 1);
+        row.querySelector('[data-track-title]').className =
+          `font-bold text-sm truncate ${isCurrent ? 'text-accent' : 'text-white'}`;
       });
     }
 
     // 4. Chọn bài hát & cập nhật Memory Spotlight
-    function selectTrack(index, autoPlay = false) {
+    function selectTrack(index) {
       currentTrackIndex = (index + CONFIG.tracks.length) % CONFIG.tracks.length;
       const track = CONFIG.tracks[currentTrackIndex];
 
@@ -833,17 +879,31 @@ Thương ebe rất nhiều!`,
       document.getElementById('totalTimeText').textContent = track.duration === '∞' ? '∞' : track.duration;
 
       // Spotlight Card
+      const spotlightImg = document.getElementById('spotlightImg');
       document.getElementById('spotlightTrackBadge').textContent = `Track #${currentTrackIndex + 1}`;
-      document.getElementById('spotlightImg').src = track.image;
-      document.getElementById('spotlightImg').dataset.photoTrackId = String(track.id);
+      spotlightImg.dataset.photoTrackId = String(track.id);
       document.getElementById('spotlightTitle').textContent = track.title;
       document.getElementById('spotlightNote').textContent = track.note;
 
-      if (autoPlay && !isPlaying) {
-        togglePlayPause(true);
+      const photoId = photoSettings.track_photo_ids[track.id];
+      const photoRecord = photoRecords.find(item => item.id === photoId);
+      if (photoSession && photoRecord) {
+        const selectedIndex = currentTrackIndex;
+        const userId = photoSession.user.id;
+        getPhotoUrl(photoRecord.object_path).then(signedUrl => {
+          if (photoSession?.user.id === userId && currentTrackIndex === selectedIndex) {
+            spotlightImg.src = signedUrl;
+          }
+        }).catch(error => {
+          if (photoSession?.user.id === userId && currentTrackIndex === selectedIndex) {
+            spotlightImg.src = './images/image-placeholder.svg';
+            setPhotoStatus(error.message, 'error');
+          }
+        });
       } else {
-        renderTracklist();
+        spotlightImg.src = track.image;
       }
+      renderTracklist();
     }
 
     // 5. Điều khiển Phát / Tạm dừng
@@ -901,7 +961,7 @@ Thương ebe rất nhiều!`,
         progressPercent = (progressPercent + 2) % 102;
         if (progressPercent > 100) progressPercent = 0;
 
-        document.getElementById('progressBar').value = progressPercent;
+        updateProgressBar(progressPercent);
 
         // Cập nhật đồng hồ giả lập
         const secTotal = Math.floor((progressPercent / 100) * 180);
@@ -1088,16 +1148,28 @@ Thương ebe rất nhiều!`,
       const imageLoads = [];
       const avatarRecord = photoRecords.find(item => item.id === photoSettings.avatar_photo_id);
       if (avatarRecord) {
-        imageLoads.push(
-          setPrivateImage(document.getElementById('vinylAvatar'), avatarRecord.object_path, userId),
-          setPrivateImage(document.getElementById('albumCoverImg'), avatarRecord.object_path, userId)
-        );
+        imageLoads.push(setPrivateImage(document.getElementById('vinylAvatar'), avatarRecord.object_path, userId));
+      } else {
+        document.getElementById('vinylAvatar').src = CONFIG.avatarUrl;
+      }
+      const coverRecord = photoRecords.find(item => item.id === photoSettings.cover_photo_id);
+      if (coverRecord) {
+        imageLoads.push(setPrivateImage(document.getElementById('albumCoverImg'), coverRecord.object_path, userId));
+      } else if (!coverAssignmentSupported && avatarRecord) {
+        imageLoads.push(setPrivateImage(document.getElementById('albumCoverImg'), avatarRecord.object_path, userId));
+      } else {
+        document.getElementById('albumCoverImg').src = CONFIG.avatarUrl;
       }
 
       document.querySelectorAll('[data-photo-track-id]').forEach(image => {
         const photoId = photoSettings.track_photo_ids[image.dataset.photoTrackId];
         const record = photoRecords.find(item => item.id === photoId);
-        if (record) imageLoads.push(setPrivateImage(image, record.object_path, userId));
+        if (record) {
+          imageLoads.push(setPrivateImage(image, record.object_path, userId));
+        } else {
+          const track = CONFIG.tracks.find(item => String(item.id) === image.dataset.photoTrackId);
+          image.src = track?.image || './images/image-placeholder.svg';
+        }
       });
       const results = await Promise.all(imageLoads);
       return results.every(Boolean);
@@ -1147,13 +1219,30 @@ Thương ebe rất nhiều!`,
             .select('id, object_path, file_name, created_at')
             .order('created_at', { ascending: false }),
           photoClient.from('site_photo_settings')
-            .select('avatar_photo_id, track_photo_ids')
+            .select('avatar_photo_id, cover_photo_id, track_photo_ids')
             .eq('id', true)
             .single()
         ]);
       } catch (error) {
         setPhotoStatus(`Không kết nối được thư viện ảnh: ${error.message || 'lỗi mạng không xác định'}`, 'error');
         return false;
+      }
+
+      coverAssignmentSupported = true;
+      const settingsError = settingsResult.error;
+      if (settingsError
+        && /cover_photo_id/i.test(settingsError.message)
+        && /(column|schema cache|could not find|does not exist)/i.test(settingsError.message)) {
+        try {
+          settingsResult = await photoClient.from('site_photo_settings')
+            .select('avatar_photo_id, track_photo_ids')
+            .eq('id', true)
+            .single();
+          coverAssignmentSupported = false;
+        } catch (error) {
+          setPhotoStatus(`Không tải được cài đặt ảnh: ${error.message || 'lỗi mạng không xác định'}`, 'error');
+          return false;
+        }
       }
 
       if (recordsResult.error || settingsResult.error) {
@@ -1165,16 +1254,22 @@ Thương ebe rất nhiều!`,
       photoRecords = recordsResult.data || [];
       photoSettings = {
         avatar_photo_id: settingsResult.data.avatar_photo_id,
+        cover_photo_id: settingsResult.data.cover_photo_id || null,
         track_photo_ids: settingsResult.data.track_photo_ids || {}
       };
       const libraryImagesLoaded = await renderPhotoLibrary();
       document.getElementById('vinylAvatar').src = CONFIG.avatarUrl;
       document.getElementById('albumCoverImg').src = CONFIG.avatarUrl;
       renderTracklist();
-      selectTrack(currentTrackIndex, false);
+      selectTrack(currentTrackIndex);
       const imagesLoaded = await applyAssignedPhotoImages();
       if (showSuccess && imagesLoaded && libraryImagesLoaded) {
-        setPhotoStatus('Thư viện ảnh đã được đồng bộ.', 'success');
+        setPhotoStatus(
+          coverAssignmentSupported
+            ? 'Thư viện ảnh đã được đồng bộ.'
+            : 'Thư viện ảnh đã đồng bộ. Chạy SQL migration cover_photo_id trong images/README.md để bật gán ảnh bìa/logo riêng.',
+          coverAssignmentSupported ? 'success' : 'info'
+        );
       }
       return true;
     }
@@ -1196,12 +1291,12 @@ Thương ebe rất nhiều!`,
       const imageLoads = [];
       photoRecords.forEach(record => {
         const card = document.createElement('article');
-        card.className = 'rounded-2xl overflow-hidden bg-[#121217] border border-white/10';
+        card.className = 'relative rounded-2xl bg-[#121217] border border-white/10';
         const image = document.createElement('img');
         image.src = './images/image-placeholder.svg';
         image.alt = record.file_name;
         image.loading = 'lazy';
-        image.className = 'w-full aspect-square object-cover bg-zinc-900';
+        image.className = 'w-full aspect-square rounded-t-2xl object-cover bg-zinc-900';
         image.onerror = () => {
           image.onerror = null;
           image.src = './images/image-placeholder.svg';
@@ -1209,23 +1304,45 @@ Thương ebe rất nhiều!`,
         imageLoads.push(setPrivateImage(image, record.object_path, photoSession.user.id));
 
         const details = document.createElement('div');
-        details.className = 'p-3 space-y-2';
+        details.className = 'relative p-3 space-y-2';
         const filename = document.createElement('p');
         filename.className = 'text-xs text-zinc-300 truncate';
         filename.title = record.file_name;
         filename.textContent = record.file_name;
 
+        const actionMenu = document.createElement('div');
+        actionMenu.className = 'hidden absolute right-0 top-11 z-30 w-56 rounded-xl border border-white/15 bg-[#202027] p-2 shadow-2xl';
+        actionMenu.setAttribute('aria-label', `Thao tác ảnh ${record.file_name}`);
+
         const avatarButton = document.createElement('button');
         avatarButton.type = 'button';
         avatarButton.className = 'w-full rounded-lg bg-white/10 hover:bg-white/15 px-2 py-2 text-xs font-semibold text-white';
-        avatarButton.textContent = photoSettings.avatar_photo_id === record.id ? 'Đang dùng làm ảnh đại diện / bìa album' : 'Đặt làm ảnh đại diện / bìa album';
+        avatarButton.textContent = photoSettings.avatar_photo_id === record.id ? 'Đang dùng làm ảnh đại diện' : 'Đặt làm ảnh đại diện';
         avatarButton.disabled = photoSettings.avatar_photo_id === record.id;
-        avatarButton.onclick = () => savePhotoAssignment(record.id, 'avatar');
+        avatarButton.onclick = () => {
+          actionMenu.classList.add('hidden');
+          savePhotoAssignment(record.id, 'avatar');
+        };
 
-        const trackRow = document.createElement('div');
-        trackRow.className = 'flex gap-2';
+        const coverButton = document.createElement('button');
+        coverButton.type = 'button';
+        coverButton.className = 'mt-1 w-full rounded-lg bg-white/10 hover:bg-white/15 px-2 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50';
+        coverButton.textContent = !coverAssignmentSupported
+          ? 'Cần cập nhật Supabase để gán bìa/logo'
+          : photoSettings.cover_photo_id === record.id
+            ? 'Đang dùng làm ảnh bìa/logo'
+            : 'Đặt làm ảnh bìa/logo';
+        coverButton.disabled = !coverAssignmentSupported || photoSettings.cover_photo_id === record.id;
+        coverButton.onclick = () => {
+          actionMenu.classList.add('hidden');
+          savePhotoAssignment(record.id, 'cover');
+        };
+
+        const trackLabel = document.createElement('label');
+        trackLabel.className = 'block mt-2 px-1 text-[11px] font-semibold text-zinc-400';
+        trackLabel.textContent = 'Gán cho kỷ niệm';
         const trackSelect = document.createElement('select');
-        trackSelect.className = 'min-w-0 flex-1 rounded-lg bg-[#0c0c10] border border-white/10 px-2 py-2 text-xs text-white';
+        trackSelect.className = 'mt-1 w-full rounded-lg bg-[#0c0c10] border border-white/10 px-2 py-2 text-xs text-white';
         trackSelect.setAttribute('aria-label', `Chọn kỷ niệm cho ${record.file_name}`);
         CONFIG.tracks.forEach(track => {
           const option = document.createElement('option');
@@ -1240,23 +1357,58 @@ Thương ebe rất nhiều!`,
 
         const assignButton = document.createElement('button');
         assignButton.type = 'button';
-        assignButton.className = 'rounded-lg bg-accent px-3 py-2 text-xs font-bold text-black';
-        assignButton.textContent = 'Gán';
-        assignButton.onclick = () => savePhotoAssignment(record.id, 'track', trackSelect.value);
+        assignButton.className = 'mt-1 w-full rounded-lg bg-accent px-3 py-2 text-xs font-bold text-black';
+        assignButton.textContent = 'Gán kỷ niệm';
+        assignButton.onclick = () => {
+          actionMenu.classList.add('hidden');
+          savePhotoAssignment(record.id, 'track', trackSelect.value);
+        };
+
+        const downloadButton = document.createElement('button');
+        downloadButton.type = 'button';
+        downloadButton.className = 'w-full rounded-lg border border-white/10 bg-white/[0.03] px-2 py-2 text-xs font-semibold text-zinc-200 hover:bg-white/10';
+        downloadButton.textContent = 'Tải ảnh về máy';
+        downloadButton.setAttribute('aria-label', `Tải ảnh ${record.file_name} về máy`);
+        downloadButton.onclick = () => downloadPhoto(record);
 
         let deleteButton = null;
         if (photoSession) {
           deleteButton = document.createElement('button');
           deleteButton.type = 'button';
-          deleteButton.className = 'w-full rounded-lg border border-red-400/30 bg-red-500/10 px-2 py-2 text-xs font-semibold text-red-200 hover:bg-red-500/20';
+          deleteButton.className = 'mt-2 w-full rounded-lg border border-red-400/30 bg-red-500/10 px-2 py-2 text-xs font-semibold text-red-200 hover:bg-red-500/20';
           deleteButton.textContent = 'Xóa ảnh';
           deleteButton.setAttribute('aria-label', `Xóa ảnh ${record.file_name}`);
-          deleteButton.onclick = () => deletePhoto(record);
+          deleteButton.onclick = () => {
+            actionMenu.classList.add('hidden');
+            deletePhoto(record);
+          };
         }
 
-        trackRow.append(trackSelect, assignButton);
-        details.append(filename, avatarButton, trackRow);
-        if (deleteButton) details.appendChild(deleteButton);
+        const menuButton = document.createElement('button');
+        menuButton.type = 'button';
+        menuButton.className = 'w-9 h-9 rounded-lg bg-white/10 hover:bg-white/15 text-zinc-200 shrink-0';
+        menuButton.setAttribute('aria-label', `Mở thao tác ảnh ${record.file_name}`);
+        menuButton.setAttribute('aria-haspopup', 'true');
+        menuButton.setAttribute('aria-expanded', 'false');
+        menuButton.innerHTML = '<i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i>';
+        menuButton.onclick = event => {
+          event.stopPropagation();
+          const shouldOpen = actionMenu.classList.contains('hidden');
+          grid.querySelectorAll('[data-photo-action-menu]').forEach(menu => menu.classList.add('hidden'));
+          grid.querySelectorAll('[data-photo-menu-trigger]').forEach(button => button.setAttribute('aria-expanded', 'false'));
+          actionMenu.classList.toggle('hidden', !shouldOpen);
+          menuButton.setAttribute('aria-expanded', String(shouldOpen));
+        };
+        actionMenu.dataset.photoActionMenu = '';
+        actionMenu.onclick = event => event.stopPropagation();
+
+        actionMenu.append(avatarButton, coverButton, trackLabel, trackSelect, assignButton);
+        if (deleteButton) actionMenu.appendChild(deleteButton);
+        const filenameRow = document.createElement('div');
+        filenameRow.className = 'relative flex items-center gap-2';
+        filenameRow.append(filename, menuButton);
+        menuButton.dataset.photoMenuTrigger = '';
+        details.append(filenameRow, actionMenu, downloadButton);
         card.append(image, details);
         grid.appendChild(card);
       });
@@ -1269,13 +1421,20 @@ Thương ebe rất nhiều!`,
         setPhotoStatus('Bạn cần đăng nhập quản trị để thay đổi ảnh.', 'error');
         return;
       }
+      if (target === 'cover' && !coverAssignmentSupported) {
+        setPhotoStatus('Chạy SQL migration cover_photo_id trong images/README.md để bật gán ảnh bìa/logo riêng.', 'error');
+        return;
+      }
 
       const updatedSettings = {
         avatar_photo_id: photoSettings.avatar_photo_id,
         track_photo_ids: { ...photoSettings.track_photo_ids }
       };
+      if (coverAssignmentSupported) updatedSettings.cover_photo_id = photoSettings.cover_photo_id;
       if (target === 'avatar') {
         updatedSettings.avatar_photo_id = photoId;
+      } else if (target === 'cover') {
+        updatedSettings.cover_photo_id = photoId;
       } else {
         updatedSettings.track_photo_ids[String(trackId)] = photoId;
       }
@@ -1296,6 +1455,34 @@ Thương ebe rất nhiều!`,
       }
       if (!await refreshPhotoLibrary()) return;
       setPhotoStatus('Đã lưu ảnh dùng chung cho trang.', 'success');
+    }
+
+    async function downloadPhoto(record) {
+      if (!photoClient || !photoSession) {
+        setPhotoStatus('Bạn cần đăng nhập để tải ảnh về máy.', 'error');
+        return;
+      }
+
+      try {
+        setPhotoStatus(`Đang chuẩn bị tải ${record.file_name}...`);
+        const signedUrl = await getPhotoUrl(record.object_path);
+        const response = await fetch(signedUrl);
+        if (!response.ok) {
+          throw new Error(`Máy chủ ảnh trả về lỗi ${response.status}.`);
+        }
+        const imageBlob = await response.blob();
+        const objectUrl = URL.createObjectURL(imageBlob);
+        const link = document.createElement('a');
+        link.href = objectUrl;
+        link.download = record.file_name.replace(/[\\/:*?"<>|]/g, '_') || 'album-photo';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(objectUrl), 30000);
+        setPhotoStatus(`Đã tải ${record.file_name} về máy.`, 'success');
+      } catch (error) {
+        setPhotoStatus(`Không tải được ảnh: ${error.message || 'lỗi mạng không xác định'}`, 'error');
+      }
     }
 
     async function deletePhoto(record) {
@@ -1328,12 +1515,18 @@ Thương ebe rất nhiều!`,
             : photoSettings.avatar_photo_id,
           track_photo_ids: { ...photoSettings.track_photo_ids }
         };
+        if (coverAssignmentSupported) {
+          updatedSettings.cover_photo_id = photoSettings.cover_photo_id === record.id
+            ? null
+            : photoSettings.cover_photo_id;
+        }
         Object.keys(updatedSettings.track_photo_ids).forEach(trackId => {
           if (updatedSettings.track_photo_ids[trackId] === record.id) {
             delete updatedSettings.track_photo_ids[trackId];
           }
         });
         const hasAssignments = updatedSettings.avatar_photo_id !== photoSettings.avatar_photo_id
+          || (coverAssignmentSupported && updatedSettings.cover_photo_id !== photoSettings.cover_photo_id)
           || Object.keys(updatedSettings.track_photo_ids).length !== Object.keys(photoSettings.track_photo_ids).length;
 
         if (hasAssignments) {
@@ -1477,9 +1670,16 @@ Thương ebe rất nhiều!`,
       };
       document.addEventListener('keydown', event => {
         if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
+          modal.querySelectorAll('[data-photo-action-menu]').forEach(menu => menu.classList.add('hidden'));
+          modal.querySelectorAll('[data-photo-menu-trigger]').forEach(button => button.setAttribute('aria-expanded', 'false'));
           modal.classList.add('hidden');
           modal.classList.remove('flex');
         }
+      });
+      document.addEventListener('click', event => {
+        if (event.target.closest('[data-photo-action-menu], [data-photo-menu-trigger]')) return;
+        modal.querySelectorAll('[data-photo-action-menu]').forEach(menu => menu.classList.add('hidden'));
+        modal.querySelectorAll('[data-photo-menu-trigger]').forEach(button => button.setAttribute('aria-expanded', 'false'));
       });
     }
 
@@ -1499,7 +1699,7 @@ Thương ebe rất nhiều!`,
         if (isPlaying) togglePlayPause(false);
         photoSession = null;
         photoRecords = [];
-        photoSettings = { avatar_photo_id: null, track_photo_ids: {} };
+        photoSettings = { avatar_photo_id: null, cover_photo_id: null, track_photo_ids: {} };
         photoUrlCache.clear();
         protectedApp.classList.add('hidden');
         loginGate.classList.remove('hidden');
@@ -1607,17 +1807,18 @@ Thương ebe rất nhiều!`,
       document.getElementById('vinylDisc').onclick = () => togglePlayPause();
 
       // Next / Prev / Shuffle / Like
-      document.getElementById('nextBtn').onclick = () => selectTrack(currentTrackIndex + 1, true);
-      document.getElementById('prevBtn').onclick = () => selectTrack(currentTrackIndex - 1, true);
+      document.getElementById('nextBtn').onclick = () => selectTrack(currentTrackIndex + 1);
+      document.getElementById('prevBtn').onclick = () => selectTrack(currentTrackIndex - 1);
       document.getElementById('shuffleBtn').onclick = () => {
         const rand = Math.floor(Math.random() * CONFIG.tracks.length);
-        selectTrack(rand, true);
+        selectTrack(rand);
       };
       document.getElementById('likeBtn').onclick = () => spawnFloatingHearts(25);
 
       // Thanh tua nhạc
       document.getElementById('progressBar').oninput = (e) => {
         progressPercent = Number(e.target.value);
+        updateProgressBar(progressPercent);
         const lineIndex = Math.min(
           CONFIG.letterLines.length - 1,
           Math.floor((progressPercent / 100) * CONFIG.letterLines.length)

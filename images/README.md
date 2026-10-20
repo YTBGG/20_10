@@ -36,9 +36,14 @@ create table if not exists public.photo_library (
 create table if not exists public.site_photo_settings (
   id boolean primary key default true check (id = true),
   avatar_photo_id uuid references public.photo_library(id) on delete set null,
+  cover_photo_id uuid references public.photo_library(id) on delete set null,
   track_photo_ids jsonb not null default '{}'::jsonb
     check (jsonb_typeof(track_photo_ids) = 'object')
 );
+
+alter table public.site_photo_settings
+  add column if not exists cover_photo_id uuid
+  references public.photo_library(id) on delete set null;
 
 insert into public.site_photo_settings (id)
 values (true)
