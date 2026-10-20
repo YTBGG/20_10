@@ -212,8 +212,29 @@
         <input id="loginPassword" type="password" autocomplete="current-password" required class="mt-1 w-full rounded-xl bg-[#0c0c10] border border-white/15 px-3 py-3 text-sm text-white outline-none focus:border-pink-400" />
       </label>
       <button id="loginSubmitBtn" type="submit" class="mt-5 w-full rounded-xl bg-accent px-4 py-3 font-bold text-black hover:brightness-110">Đăng nhập</button>
+      <button id="forgotPasswordBtn" type="button" class="mt-3 w-full text-sm text-zinc-300 hover:text-white">Quên mật khẩu?</button>
       <p id="loginStatus" class="mt-4 min-h-5 text-sm text-zinc-400" role="status" aria-live="polite">Đang kiểm tra phiên đăng nhập...</p>
     </form>
+
+    <section id="passwordRecoveryPanel" class="hidden w-full max-w-md rounded-3xl border border-white/10 bg-[#18181c] p-6 sm:p-8 shadow-2xl">
+      <div class="text-center">
+        <div class="mx-auto w-14 h-14 rounded-full bg-accent flex items-center justify-center text-black text-2xl shadow-accent">
+          <i class="fa-solid fa-key"></i>
+        </div>
+        <h1 class="mt-5 text-2xl font-extrabold text-white">Đặt mật khẩu mới</h1>
+        <p class="mt-2 text-sm text-zinc-400">Chọn mật khẩu mới cho tài khoản album của bạn.</p>
+      </div>
+      <form id="passwordRecoveryForm" class="mt-6">
+        <label class="block text-sm text-zinc-300">Mật khẩu mới
+          <input id="newPassword" type="password" autocomplete="new-password" minlength="8" required class="mt-1 w-full rounded-xl bg-[#0c0c10] border border-white/15 px-3 py-3 text-sm text-white outline-none focus:border-pink-400" />
+        </label>
+        <label class="block mt-4 text-sm text-zinc-300">Nhập lại mật khẩu mới
+          <input id="confirmNewPassword" type="password" autocomplete="new-password" minlength="8" required class="mt-1 w-full rounded-xl bg-[#0c0c10] border border-white/15 px-3 py-3 text-sm text-white outline-none focus:border-pink-400" />
+        </label>
+        <button id="passwordRecoverySubmitBtn" type="submit" class="mt-5 w-full rounded-xl bg-accent px-4 py-3 font-bold text-black hover:brightness-110">Lưu mật khẩu mới</button>
+      </form>
+      <p id="passwordRecoveryStatus" class="mt-4 min-h-5 text-sm text-zinc-400" role="status" aria-live="polite"></p>
+    </section>
   </div>
 
   <div id="protectedApp" class="hidden">
@@ -700,6 +721,14 @@ Thương ebe rất nhiều!`,
     let coverAssignmentSupported = true;
     let renderedAuthenticatedApp = false;
     let photoSettings = { avatar_photo_id: null, cover_photo_id: null, track_photo_ids: {} };
+    const authHashParams = new URLSearchParams(window.location.hash.slice(1));
+    const authQueryParams = new URLSearchParams(window.location.search.slice(1));
+    const authCallbackParams = new URLSearchParams(`${window.location.search.slice(1)}&${window.location.hash.slice(1)}`);
+    let authCallbackError = authCallbackParams.get('error_description') || authCallbackParams.get('error_code');
+    let passwordRecoveryMode = !authCallbackError && (
+      (authHashParams.get('type') === 'recovery' && Boolean(authHashParams.get('access_token')))
+      || (authQueryParams.get('type') === 'recovery' && Boolean(authQueryParams.get('access_token')))
+    );
     let currentTrackIndex = 0;
     let isPlaying = false;
     let progressPercent = 0;
@@ -1688,6 +1717,16 @@ Thương ebe rất nhiều!`,
       const protectedApp = document.getElementById('protectedApp');
       const loginGate = document.getElementById('loginGate');
       const loginStatus = document.getElementById('loginStatus');
+      if (passwordRecoveryMode) {
+        protectedApp.classList.add('hidden');
+        loginGate.classList.remove('hidden');
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('passwordRecoveryPanel').classList.remove('hidden');
+        document.getElementById('passwordRecoveryStatus').textContent = 'Liên kết hợp lệ. Hãy nhập mật khẩu mới.';
+        return;
+      }
+      document.getElementById('loginForm').classList.remove('hidden');
+      document.getElementById('passwordRecoveryPanel').classList.add('hidden');
       if (!PHOTO_CONFIG.supabaseUrl.trim() || !PHOTO_CONFIG.supabaseAnonKey.trim()) {
         protectedApp.classList.add('hidden');
         loginGate.classList.remove('hidden');
@@ -1703,7 +1742,13 @@ Thương ebe rất nhiều!`,
         photoUrlCache.clear();
         protectedApp.classList.add('hidden');
         loginGate.classList.remove('hidden');
-        loginStatus.textContent = 'Đăng nhập bằng tài khoản được chia sẻ riêng để xem album.';
+        loginStatus.textContent = authCallbackError
+          ? 'Liên kết xác thực không hợp lệ hoặc đã hết hạn. Hãy yêu cầu gửi email đặt lại mật khẩu mới.'
+          : 'Đăng nhập bằng tài khoản được chia sẻ riêng để xem album.';
+        if (authCallbackError) {
+          authCallbackError = null;
+          window.history.replaceState(null, document.title, window.location.pathname);
+        }
         document.getElementById('loginPassword').value = '';
         document.getElementById('vinylAvatar').src = CONFIG.avatarUrl;
         document.getElementById('albumCoverImg').src = CONFIG.avatarUrl;
@@ -1729,6 +1774,9 @@ Thương ebe rất nhiều!`,
       const loginForm = document.getElementById('loginForm');
       const submitButton = document.getElementById('loginSubmitBtn');
       const loginStatus = document.getElementById('loginStatus');
+      const recoveryForm = document.getElementById('passwordRecoveryForm');
+      const recoverySubmitButton = document.getElementById('passwordRecoverySubmitBtn');
+      const recoveryStatus = document.getElementById('passwordRecoveryStatus');
 
       if (!PHOTO_CONFIG.supabaseUrl.trim() || !PHOTO_CONFIG.supabaseAnonKey.trim()) {
         loginStatus.textContent = 'Đăng nhập chưa được cấu hình. Liên hệ chủ trang.';
@@ -1742,8 +1790,36 @@ Thương ebe rất nhiều!`,
       photoClient = window.supabase.createClient(
         PHOTO_CONFIG.supabaseUrl.trim(),
         PHOTO_CONFIG.supabaseAnonKey.trim(),
-        { auth: { autoRefreshToken: true, persistSession: true, detectSessionInUrl: false } }
+        { auth: { autoRefreshToken: true, persistSession: true, detectSessionInUrl: true } }
       );
+
+      document.getElementById('forgotPasswordBtn').onclick = async () => {
+        const email = document.getElementById('loginEmail').value.trim();
+        if (!email) {
+          loginStatus.textContent = 'Nhập email tài khoản trước, rồi bấm “Quên mật khẩu?”.';
+          document.getElementById('loginEmail').focus();
+          return;
+        }
+
+        const redirectTo = window.location.protocol === 'file:'
+          ? 'https://ytbgg.github.io/20_10/'
+          : `${window.location.origin}${window.location.pathname}`;
+        const forgotButton = document.getElementById('forgotPasswordBtn');
+        forgotButton.disabled = true;
+        loginStatus.textContent = 'Đang gửi email khôi phục...';
+        try {
+          const { error } = await photoClient.auth.resetPasswordForEmail(email, { redirectTo });
+          if (error) {
+            loginStatus.textContent = `Không gửi được email khôi phục: ${error.message}`;
+            return;
+          }
+          loginStatus.textContent = 'Nếu email này có tài khoản, hướng dẫn đặt lại mật khẩu đã được gửi. Hãy kiểm tra cả thư mục spam.';
+        } catch (error) {
+          loginStatus.textContent = `Lỗi khi gửi email khôi phục: ${error.message || 'vui lòng thử lại'}`;
+        } finally {
+          forgotButton.disabled = false;
+        }
+      };
 
       loginForm.onsubmit = async event => {
         event.preventDefault();
@@ -1770,6 +1846,44 @@ Thương ebe rất nhiều!`,
         }
       };
 
+      recoveryForm.onsubmit = async event => {
+        event.preventDefault();
+        const newPassword = document.getElementById('newPassword');
+        const confirmNewPassword = document.getElementById('confirmNewPassword');
+        if (newPassword.value !== confirmNewPassword.value) {
+          recoveryStatus.textContent = 'Hai mật khẩu chưa khớp. Hãy nhập lại.';
+          confirmNewPassword.focus();
+          return;
+        }
+
+        recoverySubmitButton.disabled = true;
+        recoveryStatus.textContent = 'Đang cập nhật mật khẩu...';
+        try {
+          const { error } = await photoClient.auth.updateUser({ password: newPassword.value });
+          if (error) {
+            recoveryStatus.textContent = `Không cập nhật được mật khẩu: ${error.message}`;
+            return;
+          }
+          passwordRecoveryMode = false;
+          newPassword.value = '';
+          confirmNewPassword.value = '';
+          recoveryStatus.textContent = 'Đã đổi mật khẩu. Đang mở album...';
+          window.history.replaceState(null, document.title, window.location.pathname);
+          const { data, error: sessionError } = await photoClient.auth.getSession();
+          if (sessionError) {
+            recoveryStatus.textContent = `Đã đổi mật khẩu nhưng không kiểm tra được phiên đăng nhập: ${sessionError.message}. Hãy đăng nhập lại.`;
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('passwordRecoveryPanel').classList.add('hidden');
+            return;
+          }
+          await showAuthenticatedApp(data.session);
+        } catch (error) {
+          recoveryStatus.textContent = `Lỗi khi cập nhật mật khẩu: ${error.message || 'vui lòng thử lại'}`;
+        } finally {
+          recoverySubmitButton.disabled = false;
+        }
+      };
+
       document.getElementById('appSignOutBtn').onclick = async () => {
         try {
           const { error } = await photoClient.auth.signOut();
@@ -1781,12 +1895,22 @@ Thương ebe rất nhiều!`,
         }
       };
 
-      photoClient.auth.onAuthStateChange((_event, session) => {
+      photoClient.auth.onAuthStateChange((event, session) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          passwordRecoveryMode = true;
+          window.history.replaceState(null, document.title, window.location.pathname);
+          window.setTimeout(() => showAuthenticatedApp(session), 0);
+          return;
+        }
         window.setTimeout(() => showAuthenticatedApp(session), 0);
       });
       photoClient.auth.getSession().then(({ data, error }) => {
         if (error) {
           loginStatus.textContent = `Không kiểm tra được phiên đăng nhập: ${error.message}`;
+          return;
+        }
+        if (passwordRecoveryMode) {
+          showAuthenticatedApp(data.session);
           return;
         }
         showAuthenticatedApp(data.session);

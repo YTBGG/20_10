@@ -18,6 +18,18 @@ Khách chưa đăng nhập không được đọc bảng ảnh hoặc xem ảnh 
 4. Đăng nhập vào trang được triển khai. Ảnh được tải lên từ thư viện sẽ nằm trong
    bucket private; chỉ người có tài khoản được tạo trong dự án mới xem được.
 
+## Đặt lại mật khẩu
+
+1. Trong Supabase, mở **Authentication → URL Configuration**. Đặt **Site URL** là
+   `https://ytbgg.github.io/20_10/` và thêm
+   `https://ytbgg.github.io/20_10/**` vào **Redirect URLs**. Chỉ thêm
+   `http://localhost:3000/**` nếu cần thử trên máy local.
+2. Giữ mẫu email **Reset Password** mặc định dùng `{{ .ConfirmationURL }}` để
+   Supabase xác minh liên kết trước khi chuyển về trang.
+3. Trên trang, nhập email tài khoản rồi bấm **Quên mật khẩu?**. Mở email mới nhất,
+   bấm liên kết và đặt mật khẩu mới trên trang album. Liên kết đặt lại cũ hoặc đã
+   hết hạn không dùng được; hãy yêu cầu email mới.
+
 `index.html` dùng Supabase Project URL và publishable key ở trình duyệt. Publishable
 key không phải mật khẩu; RLS và bucket private mới là lớp bảo vệ. Không bao giờ
 đưa `service_role` key, secret key hoặc mật khẩu vào source code/Git.
